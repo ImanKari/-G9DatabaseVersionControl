@@ -1,0 +1,46 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <Version>1.0.7.2</Version>
+    <Authors>Iman Kari</Authors>
+    <Company>G9Studio</Company>
+    <Product>G9 Database Version Control</Product>
+    <Description>Database Version Control</Description>
+    <Copyright>G9Studio - 2021</Copyright>
+    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+    <PackageProjectUrl>http://www.G9TM.com</PackageProjectUrl>
+    <PackageIcon>G9-Icon.png</PackageIcon>
+    <RepositoryUrl>https://github.com/ImanKari/G9DBVC</RepositoryUrl>
+    <RepositoryType>GitHub</RepositoryType>
+    <PackageTags>Database DB Version Control DatabaseVersion DatabaseVersionControl</PackageTags>
+    <PackageReleaseNotes>-- Add Base 2</PackageReleaseNotes>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <AssemblyVersion>1.0.7.2</AssemblyVersion>
+    <FileVersion>1.0.7.2</FileVersion>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <None Include="G9-Icon.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+    <None Include="LICENSE.md">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="DatabaseUpdateFiles\!Initialize!\001- Initialize.sql">
+      <Pack>true</Pack>
+      <PackagePath>DatabaseUpdateFiles\!Initialize!\001- Initialize.sql;content</PackagePath>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="build\*.*" Pack="true" PackagePath="build"></None>
+  </ItemGroup>
+  
+</Project>

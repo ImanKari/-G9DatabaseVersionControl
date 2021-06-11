@@ -5,4 +5,26 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Content Remove="C:\Users\ImanKari\.nuget\packages\g9dbvc\1.0.2.6\build\..\DatabaseUpdateFiles\Initialize.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="C:\Users\ImanKari\.nuget\packages\g9dbvc\1.0.2.6\build\..\DatabaseUpdateFiles\Initialize.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="C:\Users\ImanKari\.nuget\packages\g9dbvc\1.0.2.6\build\..\DatabaseUpdateFiles\Initialize.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="G9DatabaseVersionControlCore" Version="1.0.7.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="C:\Users\ImanKari\.nuget\packages\g9dbvc\1.0.6.9\build\..\DatabaseUpdateFiles\!Initialize!\001- Initialize.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>
