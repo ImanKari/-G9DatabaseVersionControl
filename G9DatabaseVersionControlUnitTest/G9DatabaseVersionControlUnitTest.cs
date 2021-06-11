@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 using G9DatabaseVersionControlCore.Class.SmallLogger;
 using NUnit.Framework;
 
-namespace NUnitTestG9DatabaseVersionControlCore
+namespace G9DatabaseVersionControlUnitTest
 {
-    public class G9DatabaseVersionControlCoreUnitTest
+    public class G9DatabaseVersionControlUnitTest
     {
         [SetUp]
         public void Setup()
