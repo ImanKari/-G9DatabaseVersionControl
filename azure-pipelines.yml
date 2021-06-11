@@ -23,7 +23,7 @@ steps:
 
 - task: VSBuild@1
   inputs:
-    solution: 'G9DBVC/G9DatabaseVersionControl.sln'
+    solution: 'G9DatabaseVersionControlCore/G9DatabaseVersionControlCore.sln'
     msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="$(build.artifactStagingDirectory)"'
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
@@ -35,12 +35,12 @@ steps:
     configuration: '$(buildConfiguration)'
 
 - task: DotNetCoreCLI@2
-  displayName: "Publish G9DatabaseVersionControl Library nuget packages to nuget.org"
+  displayName: "Publish G9DatabaseVersionControlCore Library nuget packages to nuget.org"
   inputs:
     command: custom
     custom: nuget
     arguments: >
-      push $(Pipeline.Workspace)/**/G9DBVC/bin/Release/*.nupkg
+      push $(Pipeline.Workspace)/**/G9DatabaseVersionControlCore/bin/Release/*.nupkg
       -s https://api.nuget.org/v3/index.json
       -k $(NuGetApiKey) 
       --skip-duplicate
