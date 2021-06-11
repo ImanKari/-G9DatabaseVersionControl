@@ -23,10 +23,11 @@ steps:
 
 - task: VSBuild@1
   inputs:
-    solution: '$(solution)'
+    solution: 'G9DBVC/G9DatabaseVersionControl.sln'
     msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="$(build.artifactStagingDirectory)"'
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
+    
 
 - task: VSTest@2
   inputs:
@@ -34,7 +35,7 @@ steps:
     configuration: '$(buildConfiguration)'
 
 - task: DotNetCoreCLI@2
-  displayName: "Publish nuget packages to nuget.org"
+  displayName: "Publish G9DatabaseVersionControl Library nuget packages to nuget.org"
   inputs:
     command: custom
     custom: nuget
@@ -43,6 +44,7 @@ steps:
       -s https://api.nuget.org/v3/index.json
       -k $(NuGetApiKey) 
       --skip-duplicate
+
 - task: PowerShell@2
   displayName: "Sync Azure Devops repo with GitHub repo"
   inputs:
