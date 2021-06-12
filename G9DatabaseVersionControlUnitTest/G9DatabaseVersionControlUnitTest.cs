@@ -79,7 +79,7 @@ namespace G9DatabaseVersionControlUnitTest
         public void TestGetUpdateFiles()
         {
             var targetProject = _projectNames[new Random().Next(0, _projectNames.Count)];
-            var dbVersionControlForSqlServer = new G9CDatabaseVersionControlCoreSQLClient(_dataSource, _userId, _password, targetProject, _databaseName, "G9TM");
+            var dbVersionControlForSqlServer = new G9CDatabaseVersionControlCoreSQLServer(_dataSource, _userId, _password, targetProject, _databaseName, "G9TM");
             // From Base
             var projects = dbVersionControlForSqlServer.GetUpdateFiles();
             Assert.True(projects.Count > 0 && projects.All(s => !string.IsNullOrEmpty(s.UpdateFileName)));
@@ -90,7 +90,7 @@ namespace G9DatabaseVersionControlUnitTest
         public void TestGetUpdateFolders()
         {
             var targetProject = _projectNames[new Random().Next(0, _projectNames.Count)];
-            var dbVersionControlForSqlServer = new G9CDatabaseVersionControlCoreSQLClient(_dataSource, _userId, _password, targetProject, _databaseName, "G9TM");
+            var dbVersionControlForSqlServer = new G9CDatabaseVersionControlCoreSQLServer(_dataSource, _userId, _password, targetProject, _databaseName, "G9TM");
             // From Base
             var projects =
                 dbVersionControlForSqlServer.GetUpdateFolders();
@@ -101,7 +101,7 @@ namespace G9DatabaseVersionControlUnitTest
         [Order(6)]
         public void TestStartUpdate()
         {
-            var dbVersionControlForSqlServer = new G9CDatabaseVersionControlCoreSQLClient(_dataSource, _userId, _password, "Project2", _databaseName, "G9TM");
+            var dbVersionControlForSqlServer = new G9CDatabaseVersionControlCoreSQLServer(_dataSource, _userId, _password, "Project2", _databaseName, "G9TM");
             // From Base
             dbVersionControlForSqlServer.StartUpdate();
             Assert.Pass();

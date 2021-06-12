@@ -34,8 +34,4 @@
     <None Remove="DatabaseUpdateFiles\Project1\1.0.0.0-20210612\002- Sample.sql" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\G9DatabaseVersionControlCore.SQLClient\G9DatabaseVersionControlCore.SQLClient.csproj" />
-  </ItemGroup>
-
 </Project>

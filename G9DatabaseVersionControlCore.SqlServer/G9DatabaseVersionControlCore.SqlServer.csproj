@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
@@ -33,17 +33,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="tools\Init.ps1">
-      <PackagePath>tools\</PackagePath>
-    </Content>
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="build\*.*" Pack="true" PackagePath="build"></None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Abstract\" />
+    <ProjectReference Include="..\G9DatabaseVersionControlCore\G9DatabaseVersionControlCore.csproj" />
   </ItemGroup>
 
 </Project>

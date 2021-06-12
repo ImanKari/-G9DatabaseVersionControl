@@ -9,9 +9,9 @@ using System.Text;
 using G9DatabaseVersionControlCore.Class.SmallLogger;
 using G9DatabaseVersionControlCore.DataType;
 
-namespace G9DatabaseVersionControlCore.SQLClient
+namespace G9DatabaseVersionControlCore.SqlServer
 {
-    public class G9CDatabaseVersionControlCoreSQLClient : G9CDatabaseVersionControl
+    public class G9CDatabaseVersionControlCoreSQLServer : G9CDatabaseVersionControl
     {
         #region ### Fields And Properties ###
 
@@ -67,7 +67,7 @@ namespace G9DatabaseVersionControlCore.SQLClient
         /// <param name="defaultSchemaForTables">Specify default schema for create required table</param>
         /// <param name="productVersion">Specifies product version (Assembly version)</param>
         /// <param name="databaseUpdateFileEncoding">Specifies encoding of update file - default is UTF8</param>
-        public G9CDatabaseVersionControlCoreSQLClient(string connectionStringDataSource, string connectionStringUserId,
+        public G9CDatabaseVersionControlCoreSQLServer(string connectionStringDataSource, string connectionStringUserId,
             string connectionStringPassword, string projectName, string databaseName, string companyName,
             string databaseUpdateFilesPath = null, string defaultSchemaForTables = null, string productVersion = null,
             Encoding databaseUpdateFileEncoding = null)
