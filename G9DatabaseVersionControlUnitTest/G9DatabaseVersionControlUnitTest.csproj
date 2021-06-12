@@ -13,7 +13,29 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\G9DatabaseVersionControlCore\G9DatabaseVersionControlCore.csproj" />
+    <Content Include="DatabaseUpdateFiles\**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="DatabaseUpdateFiles\G9DatabaseVersionControlUnitTest\1.0.0.0-20210612\003- Sample 2.sql" />
+    <None Remove="DatabaseUpdateFiles\Project2\1.0.0.3-20210615\001- Help2.sql" />
+    <None Remove="DatabaseUpdateFiles\Project2\1.0.0.2-20210614\001- Help.sql" />
+    <None Remove="DatabaseUpdateFiles\Project2\1.0.0.2-20210614\002- Sample.sql" />
+    <None Remove="DatabaseUpdateFiles\Project2\1.0.0.1-20210613\001- Help.sql" />
+    <None Remove="DatabaseUpdateFiles\Project2\1.0.0.1-20210613\002- Sample.sql" />
+    <None Remove="DatabaseUpdateFiles\Project2\1.0.0.3-20210615\002- Sample2.sql" />
+    <None Remove="DatabaseUpdateFiles\Project3\1.0.0.0-20210612\001- Help.sql" />
+    <None Remove="DatabaseUpdateFiles\Project3\1.0.0.0-20210612\002- Sample.sql" />
+    <None Remove="DatabaseUpdateFiles\Project2\1.0.0.0-20210612\001- Help.sql" />
+    <None Remove="DatabaseUpdateFiles\Project2\1.0.0.0-20210612\002- Sample.sql" />
+    <None Remove="DatabaseUpdateFiles\Project1\1.0.0.0-20210612\001- Help.sql" />
+    <None Remove="DatabaseUpdateFiles\Project1\1.0.0.0-20210612\002- Sample.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\G9DatabaseVersionControlCore.SQLClient\G9DatabaseVersionControlCore.SQLClient.csproj" />
   </ItemGroup>
 
 </Project>

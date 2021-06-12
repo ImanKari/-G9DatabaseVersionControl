@@ -190,11 +190,11 @@ namespace G9DatabaseVersionControlCore.Class.SmallLogger
         ///     Used to default instance
         /// </summary>
         /// <param name="ex">Exception</param>
-        /// <param name="message">Additional message</param>
+        /// <param name="additionalMessage">Additional message</param>
         /// <param name="customCallerPath">Custom caller path</param>
         /// <param name="customCallerName">Custom caller name</param>
         /// <param name="customLineNumber">Custom line number</param>
-        public static void G9SmallLogException(this Exception ex, string message = null,
+        public static void G9SmallLogException(this Exception ex, string additionalMessage = null,
             [CallerFilePath] string customCallerPath = null,
             [CallerMemberName] string customCallerName = null,
             [CallerLineNumber] int customLineNumber = 0)
@@ -208,8 +208,8 @@ namespace G9DatabaseVersionControlCore.Class.SmallLogger
                 receiveException = receiveException.InnerException;
             }
 
-            if (!string.IsNullOrEmpty(message))
-                exceptionMessage += $"Additional Message: {message}";
+            if (!string.IsNullOrEmpty(additionalMessage))
+                exceptionMessage += $"Additional Message: {additionalMessage}";
 
             WriteLogsToStream(
                 $"{exceptionMessage}\nFile Name: {customCallerPath}\tMethod Base: {customCallerName}\tLine Number: {customLineNumber}",

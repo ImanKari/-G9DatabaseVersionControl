@@ -60,6 +60,17 @@ Set-Content -Path "$targetProjectDirectory\DatabaseUpdateFiles\$projectName\1.0.
 -- <Version>9</Version>
 Select 1 --What you want done!"
 
+#Write-Host "Set Content/Copy for DatabaseUpdateFiles diectory" -ForegroundColor Green
+#$databaseDirectoryItem = $project.ProjectItems.Item("DatabaseUpdateFiles")
+## set 'Copy To Output Directory' to 'Copy if newer'
+#$copyToOutput = $databaseDirectoryItem.Properties.Item("CopyToOutputDirectory")
+## Copy Always Always copyToOutput.Value = 1
+## Copy if Newer copyToOutput.Value = 2  
+#$copyToOutput.Value = 2
+## set 'Build Action' to 'Content'
+#$buildAction = $databaseDirectoryItem.Properties.Item("BuildAction")
+#$buildAction.Value = 2
+
 # Finish log
 $currentYear = get-date -Format yyyy
 Write-Host "
