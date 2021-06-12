@@ -3,13 +3,23 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31313.79
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "G9DatabaseVersionControlCore", "G9DatabaseVersionControlCore.csproj", "{36C19ED9-3F11-4281-BF72-46967E13AC82}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "G9DatabaseVersionControlCore", "G9DatabaseVersionControlCore.csproj", "{36C19ED9-3F11-4281-BF72-46967E13AC82}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1- Core", "1- Core", "{3E4ACD19-B347-4398-9E81-AF12DF626295}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3- Test", "3- Test", "{AD0AC159-3BC1-4CA5-AD31-F7238D6A9ABF}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "4- NUnitTest", "4- NUnitTest", "{AD0AC159-3BC1-4CA5-AD31-F7238D6A9ABF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "G9DatabaseVersionControlUnitTest", "..\G9DatabaseVersionControlUnitTest\G9DatabaseVersionControlUnitTest.csproj", "{B28918B7-21C0-492A-811F-BEB4A76EC2DB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "G9DatabaseVersionControlUnitTest", "..\G9DatabaseVersionControlUnitTest\G9DatabaseVersionControlUnitTest.csproj", "{B28918B7-21C0-492A-811F-BEB4A76EC2DB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3- Test Project", "3- Test Project", "{2381E080-8975-4F35-A34F-B74471210760}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2- Tools", "2- Tools", "{6BB0DB99-BD52-4F07-B115-58F7EB586BE2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "G9DatabaseVersionControlSampleUpdate", "..\G9DatabaseVersionControlSampleUpdate\G9DatabaseVersionControlSampleUpdate.csproj", "{1244EF67-045A-43D1-9A24-834D6F3889BE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "G9DatabaseVersionControlExternalUpdateUtility", "..\G9DatabaseVersionControlExternalUpdateUtility\G9DatabaseVersionControlExternalUpdateUtility.csproj", "{F1782B1A-E621-4A08-818C-6C30D5089C99}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "G9DatabaseVersionControlCore.SQLServer", "..\G9DatabaseVersionControlCore.SQLServer\G9DatabaseVersionControlCore.SQLServer.csproj", "{AC0DC0F2-1AFD-40CA-845F-E7F39A2E1A5A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,6 +35,18 @@ Global
 		{B28918B7-21C0-492A-811F-BEB4A76EC2DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B28918B7-21C0-492A-811F-BEB4A76EC2DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B28918B7-21C0-492A-811F-BEB4A76EC2DB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1244EF67-045A-43D1-9A24-834D6F3889BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1244EF67-045A-43D1-9A24-834D6F3889BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1244EF67-045A-43D1-9A24-834D6F3889BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1244EF67-045A-43D1-9A24-834D6F3889BE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F1782B1A-E621-4A08-818C-6C30D5089C99}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1782B1A-E621-4A08-818C-6C30D5089C99}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1782B1A-E621-4A08-818C-6C30D5089C99}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1782B1A-E621-4A08-818C-6C30D5089C99}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AC0DC0F2-1AFD-40CA-845F-E7F39A2E1A5A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC0DC0F2-1AFD-40CA-845F-E7F39A2E1A5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC0DC0F2-1AFD-40CA-845F-E7F39A2E1A5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC0DC0F2-1AFD-40CA-845F-E7F39A2E1A5A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -32,6 +54,9 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{36C19ED9-3F11-4281-BF72-46967E13AC82} = {3E4ACD19-B347-4398-9E81-AF12DF626295}
 		{B28918B7-21C0-492A-811F-BEB4A76EC2DB} = {AD0AC159-3BC1-4CA5-AD31-F7238D6A9ABF}
+		{1244EF67-045A-43D1-9A24-834D6F3889BE} = {2381E080-8975-4F35-A34F-B74471210760}
+		{F1782B1A-E621-4A08-818C-6C30D5089C99} = {6BB0DB99-BD52-4F07-B115-58F7EB586BE2}
+		{AC0DC0F2-1AFD-40CA-845F-E7F39A2E1A5A} = {3E4ACD19-B347-4398-9E81-AF12DF626295}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DCDB5801-565A-4A40-A04E-7D122FF55D93}

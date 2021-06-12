@@ -1,8 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <Version>1.0.7.4</Version>
+    <Version>1.0.9.3</Version>
     <Authors>Iman Kari</Authors>
     <Company>G9Studio</Company>
     <Product>G9 Database Version Control</Product>
@@ -17,8 +17,8 @@
     <PackageReleaseNotes>-- Add Base 3</PackageReleaseNotes>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <AssemblyVersion>1.0.7.4</AssemblyVersion>
-    <FileVersion>1.0.7.4</FileVersion>
+    <AssemblyVersion>1.0.9.3</AssemblyVersion>
+    <FileVersion>1.0.9.3</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -33,9 +33,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="DatabaseUpdateFiles\!Initialize!\001- Initialize.sql">
-      <Pack>true</Pack>
-      <PackagePath>DatabaseUpdateFiles\!Initialize!\001- Initialize.sql;content</PackagePath>
+    <Content Include="tools\Init.ps1">
+      <PackagePath>tools\</PackagePath>
     </Content>
   </ItemGroup>
 
