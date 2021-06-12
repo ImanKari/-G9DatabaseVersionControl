@@ -5,8 +5,4 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="G9DatabaseVersionControlCore" Version="1.0.9.8" />
-  </ItemGroup>
-
 </Project>
