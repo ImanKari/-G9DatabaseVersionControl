@@ -7,21 +7,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "G9DatabaseVersionControlCor
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "0- Core", "0- Core", "{3E4ACD19-B347-4398-9E81-AF12DF626295}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "4- NUnitTest", "4- NUnitTest", "{AD0AC159-3BC1-4CA5-AD31-F7238D6A9ABF}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3- NUnitTest", "3- NUnitTest", "{AD0AC159-3BC1-4CA5-AD31-F7238D6A9ABF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "G9DatabaseVersionControlUnitTest", "..\G9DatabaseVersionControlUnitTest\G9DatabaseVersionControlUnitTest.csproj", "{B28918B7-21C0-492A-811F-BEB4A76EC2DB}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3- Test Project", "3- Test Project", "{2381E080-8975-4F35-A34F-B74471210760}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2- Tools", "2- Tools", "{6BB0DB99-BD52-4F07-B115-58F7EB586BE2}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2- Test Project", "2- Test Project", "{2381E080-8975-4F35-A34F-B74471210760}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "G9DatabaseVersionControlSampleUpdate", "..\G9DatabaseVersionControlSampleUpdate\G9DatabaseVersionControlSampleUpdate.csproj", "{1244EF67-045A-43D1-9A24-834D6F3889BE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "G9DatabaseVersionControlExternalUpdateUtility", "..\G9DatabaseVersionControlExternalUpdateUtility\G9DatabaseVersionControlExternalUpdateUtility.csproj", "{F1782B1A-E621-4A08-818C-6C30D5089C99}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1- DatabaseSupport", "1- DatabaseSupport", "{C8956F96-98F1-4B04-8ECF-EAC24BEF37FA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "G9DatabaseVersionControlCore.SqlServer", "..\G9DatabaseVersionControlCore.SqlServer\G9DatabaseVersionControlCore.SqlServer.csproj", "{464DD6B5-4CF6-4E62-9DBD-4875C6353D7F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "G9DatabaseVersionControlCore.SqlServer", "..\G9DatabaseVersionControlCore.SqlServer\G9DatabaseVersionControlCore.SqlServer.csproj", "{464DD6B5-4CF6-4E62-9DBD-4875C6353D7F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,10 +37,6 @@ Global
 		{1244EF67-045A-43D1-9A24-834D6F3889BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1244EF67-045A-43D1-9A24-834D6F3889BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1244EF67-045A-43D1-9A24-834D6F3889BE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F1782B1A-E621-4A08-818C-6C30D5089C99}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F1782B1A-E621-4A08-818C-6C30D5089C99}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F1782B1A-E621-4A08-818C-6C30D5089C99}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F1782B1A-E621-4A08-818C-6C30D5089C99}.Release|Any CPU.Build.0 = Release|Any CPU
 		{464DD6B5-4CF6-4E62-9DBD-4875C6353D7F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{464DD6B5-4CF6-4E62-9DBD-4875C6353D7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{464DD6B5-4CF6-4E62-9DBD-4875C6353D7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -57,7 +49,6 @@ Global
 		{36C19ED9-3F11-4281-BF72-46967E13AC82} = {3E4ACD19-B347-4398-9E81-AF12DF626295}
 		{B28918B7-21C0-492A-811F-BEB4A76EC2DB} = {AD0AC159-3BC1-4CA5-AD31-F7238D6A9ABF}
 		{1244EF67-045A-43D1-9A24-834D6F3889BE} = {2381E080-8975-4F35-A34F-B74471210760}
-		{F1782B1A-E621-4A08-818C-6C30D5089C99} = {6BB0DB99-BD52-4F07-B115-58F7EB586BE2}
 		{464DD6B5-4CF6-4E62-9DBD-4875C6353D7F} = {C8956F96-98F1-4B04-8ECF-EAC24BEF37FA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFrameworks>netstandard1.3;netstandard1.4;netstandard1.5;netstandard1.6;netstandard2.0;netstandard2.1</TargetFrameworks>
     <Version>1.1.0.2</Version>
     <Authors>Iman Kari</Authors>
     <Company>G9Studio</Company>
@@ -44,6 +44,42 @@
 
   <ItemGroup>
     <Folder Include="Abstract\" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.3'">
+    <PackageReference Include="System.IO.FileSystem">
+      <Version>4.3.0</Version>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.4'">
+    <PackageReference Include="System.IO.FileSystem">
+      <Version>4.3.0</Version>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.5'">
+    <PackageReference Include="System.IO.FileSystem">
+      <Version>4.3.0</Version>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.6'">
+    <PackageReference Include="System.IO.FileSystem">
+      <Version>4.3.0</Version>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="System.IO.FileSystem">
+      <Version>4.3.0</Version>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.1'">
+    <PackageReference Include="System.IO.FileSystem">
+      <Version>4.3.0</Version>
+    </PackageReference>
   </ItemGroup>
 
 </Project>

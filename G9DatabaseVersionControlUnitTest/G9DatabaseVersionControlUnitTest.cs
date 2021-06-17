@@ -4,19 +4,19 @@ using System.Linq;
 using System.Threading.Tasks;
 using G9DatabaseVersionControlCore;
 using G9DatabaseVersionControlCore.Class.SmallLogger;
-using G9DatabaseVersionControlCore.SQLClient;
+using G9DatabaseVersionControlCore.SqlServer;
 using NUnit.Framework;
 
 namespace G9DatabaseVersionControlUnitTest
 {
     public class G9DatabaseVersionControlUnitTest
     {
-        private IList<string> _projectNames;
+        private readonly string _databaseName = "MDMWaterSmartMeter";
 
-        private string _dataSource = @"GAM3R-IK\MSSQLSERVER2019";
-        private string _databaseName = "MDMWaterSmartMeter";
-        private string _userId = "sa";
-        private string _password = "Pass1234";
+        private readonly string _dataSource = @"GAM3R-IK\MSSQLSERVER2019";
+        private readonly string _password = "Pass1234";
+        private readonly string _userId = "sa";
+        private IList<string> _projectNames;
 
         [SetUp]
         public void Setup()
@@ -27,7 +27,7 @@ namespace G9DatabaseVersionControlUnitTest
         [Order(1)]
         public void TestSmallLoggerWithoutInitialize()
         {
-            Parallel.For(1, 1000, counter =>
+            Parallel.For(1, 100, counter =>
             {
                 if (counter % 4 == 0)
                     new Exception($"Test Exception: {counter}",
@@ -49,7 +49,7 @@ namespace G9DatabaseVersionControlUnitTest
         {
             G9CSmallLogger.Initialize(Environment.CurrentDirectory, "CustomLogPath",
                 $"LogFile-{DateTime.Now:HH-mm-ss.fff}");
-            Parallel.For(1, 1000, counter =>
+            Parallel.For(1, 100, counter =>
             {
                 if (counter % 4 == 0)
                     new Exception($"Test Exception: {counter}",
@@ -69,7 +69,6 @@ namespace G9DatabaseVersionControlUnitTest
         [Order(3)]
         public void TestGetProjectName()
         {
-            
             _projectNames = G9CDatabaseVersionControl.GetTotalProjectNames();
             Assert.True(_projectNames.Count == 4 && _projectNames.All(s => !string.IsNullOrEmpty(s)));
         }
@@ -78,8 +77,8 @@ namespace G9DatabaseVersionControlUnitTest
         [Order(4)]
         public void TestGetUpdateFiles()
         {
-            var targetProject = _projectNames[new Random().Next(0, _projectNames.Count)];
-            var dbVersionControlForSqlServer = new G9CDatabaseVersionControlCoreSQLServer(_dataSource, _userId, _password, targetProject, _databaseName, "G9TM");
+            var dbVersionControlForSqlServer = new G9CDatabaseVersionControlCoreSQLServer(_dataSource, _userId,
+                _password, "Project2", _databaseName, "G9TM");
             // From Base
             var projects = dbVersionControlForSqlServer.GetUpdateFiles();
             Assert.True(projects.Count > 0 && projects.All(s => !string.IsNullOrEmpty(s.UpdateFileName)));
@@ -89,8 +88,8 @@ namespace G9DatabaseVersionControlUnitTest
         [Order(5)]
         public void TestGetUpdateFolders()
         {
-            var targetProject = _projectNames[new Random().Next(0, _projectNames.Count)];
-            var dbVersionControlForSqlServer = new G9CDatabaseVersionControlCoreSQLServer(_dataSource, _userId, _password, targetProject, _databaseName, "G9TM");
+            var dbVersionControlForSqlServer = new G9CDatabaseVersionControlCoreSQLServer(_dataSource, _userId,
+                _password, "Project2", _databaseName, "G9TM");
             // From Base
             var projects =
                 dbVersionControlForSqlServer.GetUpdateFolders();
@@ -99,9 +98,20 @@ namespace G9DatabaseVersionControlUnitTest
 
         [Test]
         [Order(6)]
+        public void TestResetDatabase()
+        {
+            var dbVersionControlForSqlServer = new G9CDatabaseVersionControlCoreSQLServer(_dataSource, _userId,
+                _password, "Project1", _databaseName, "G9TM");
+            dbVersionControlForSqlServer.RemoveTablesOfDatabaseVersionControlFromDatabase();
+            Assert.Pass();
+        }
+
+        [Test]
+        [Order(7)]
         public void TestStartUpdate()
         {
-            var dbVersionControlForSqlServer = new G9CDatabaseVersionControlCoreSQLServer(_dataSource, _userId, _password, "Project2", _databaseName, "G9TM");
+            var dbVersionControlForSqlServer = new G9CDatabaseVersionControlCoreSQLServer(_dataSource, _userId,
+                _password, "Project1", _databaseName, "G9TM");
             // From Base
             dbVersionControlForSqlServer.StartUpdate();
             Assert.Pass();

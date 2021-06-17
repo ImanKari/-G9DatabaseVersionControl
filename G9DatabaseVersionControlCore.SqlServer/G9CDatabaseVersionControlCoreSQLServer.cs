@@ -9,8 +9,15 @@ using System.Text;
 using G9DatabaseVersionControlCore.Class.SmallLogger;
 using G9DatabaseVersionControlCore.DataType;
 
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedMemberInSuper.Global
+
 namespace G9DatabaseVersionControlCore.SqlServer
 {
+    /// <summary>
+    ///     A class for database version control for SQLServer
+    /// </summary>
+    // ReSharper disable once InconsistentNaming
     public class G9CDatabaseVersionControlCoreSQLServer : G9CDatabaseVersionControl
     {
         #region ### Fields And Properties ###
@@ -43,7 +50,7 @@ namespace G9DatabaseVersionControlCore.SqlServer
                     !string.IsNullOrEmpty(ConnectionStringDataSource))
                     return ConvertFieldToConnectionString(ConnectionStringDataSource, ConnectionStringUserId,
                         ConnectionStringPassword);
-                throw new Exception("اطلاعات برای ساخت کانکشن استرینگ ناقص است.");
+                throw new Exception("String connection construction information is incomplete.");
             }
         }
 
@@ -171,9 +178,7 @@ namespace G9DatabaseVersionControlCore.SqlServer
                     using (var command = new SqlCommand("SELECT db_id('" + databaseName + "')", connection))
                     {
                         connection.Open();
-                        if (command.ExecuteScalar() == DBNull.Value)
-                            return false;
-                        return true;
+                        return command.ExecuteScalar() != DBNull.Value;
                     }
                 }
             }
@@ -216,9 +221,7 @@ namespace G9DatabaseVersionControlCore.SqlServer
             {
                 var result =
                     ExecuteQueryWithResult($"SELECT DatabaseVersion FROM [{SchemaForTables}].[G9DatabaseVersion]");
-                if (((result as DataTable)?.Rows?.Count ?? 0) > 0)
-                    return (result as DataTable).Rows[0][0].ToString();
-                return "0.0.0.0";
+                return result.Any() && result[0].Any() ? result[0]["DatabaseVersion"].ToString() : "0.0.0.0";
             }
             catch (Exception ex)
             {
@@ -286,14 +289,46 @@ END;");
         }
 
         /// <inheritdoc />
+        public override bool RemoveTablesOfDatabaseVersionControlFromDatabase()
+        {
+            try
+            {
+                ExecuteQueryWithoutResult($@"IF EXISTS
+(
+    SELECT 1
+    FROM INFORMATION_SCHEMA.TABLES
+    WHERE TABLE_SCHEMA = '{SchemaForTables}'
+          AND TABLE_NAME = 'G9DatabaseVersion'
+)
+    DROP TABLE [{SchemaForTables}].[G9DatabaseVersion];
+IF EXISTS
+(
+    SELECT 1
+    FROM INFORMATION_SCHEMA.TABLES
+    WHERE TABLE_SCHEMA = '{SchemaForTables}'
+          AND TABLE_NAME = 'G9DatabaseUpdateHistory'
+)
+    DROP TABLE [{SchemaForTables}].[G9DatabaseUpdateHistory];");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                ex.G9SmallLogException();
+                return false;
+            }
+        }
+
+        /// <inheritdoc />
         public override void StartUpdate()
         {
-            ExecutesScriptsOnDatabase(GetUpdateFolders(), GetCountOfUpdateFiles());
+            if (CheckUpdateExist())
+                ExecutesScriptsOnDatabase(GetUpdateFolders(), GetCountOfUpdateFiles());
         }
 
         /// <inheritdoc />
         public override void StartInstall()
         {
+            var success = RestoreDatabase(string.Empty, string.Empty, string.Empty);
             throw new NotImplementedException();
         }
 
@@ -303,22 +338,20 @@ END;");
             try
             {
                 if (CheckDatabaseExist())
-                    using (var sqlcon = new SqlConnection(ConnectionString))
+                    using (var sqlCon = new SqlConnection(ConnectionString))
                     {
                         var backupUrl = Path.Combine(backupPath, $"{DatabaseName}-{DateTime.Now:yyyy-MM-dd-HH-mm}.bak");
                         if (File.Exists(backupUrl))
                             File.Delete(Path.Combine(backupPath,
                                 $"{DatabaseName}-{DateTime.Now:yyyy-MM-dd-HH-mm}.bak"));
 
-                        sqlcon.Open();
+                        sqlCon.Open();
 
 
-                        using (var sqlcmd = new SqlCommand(
-                            "backup database " + DatabaseName + " to disk='" + backupUrl + "'", sqlcon))
+                        using (var sqlCmd = new SqlCommand(
+                            "backup database " + DatabaseName + " to disk='" + backupUrl + "'", sqlCon))
                         {
-                            if (sqlcmd.ExecuteNonQuery() != 0) return true;
-
-                            return false;
+                            return sqlCmd.ExecuteNonQuery() != 0;
                         }
                     }
 
@@ -368,7 +401,7 @@ END;");
 ([UpdateFileFullPath], [ExecuteDateTime], [Author], [Description], [UpdateDateTime], [Version], [IsSuccess])
 VALUES
 ('{FixedLengthFromEndOfString(file.UpdateFileFullPath, 300)}', GETDATE(), '{FixedLengthFromEndOfString(file.Author, 30)}',
-'{FixedLengthFromEndOfString(file.Description, 30)}',  '{file.UpdateDateTime.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture)}',
+'{FixedLengthFromEndOfString(file.Description, 300)}',  '{file.UpdateDateTime.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture)}',
 '{FixedLengthFromEndOfString(file.Version, 30)}', 1);";
                             try
                             {
@@ -417,7 +450,7 @@ VALUES
         }
 
         /// <inheritdoc />
-        protected override void ExecuteQueryWithoutResult(string query)
+        public override void ExecuteQueryWithoutResult(string query)
         {
             using (var connection = new SqlConnection(ConnectionString))
             {
@@ -435,9 +468,9 @@ VALUES
         }
 
         /// <inheritdoc />
-        protected override object ExecuteQueryWithResult(string query)
+        public override List<Dictionary<string, object>> ExecuteQueryWithResult(string query)
         {
-            var dt = new DataTable();
+            var data = new List<Dictionary<string, object>>();
             using (var connection = new SqlConnection(ConnectionString))
             {
                 connection.Open();
@@ -450,11 +483,17 @@ VALUES
                     command.CommandTimeout = 0;
                     using (var reader = command.ExecuteReader())
                     {
-                        dt.Load(reader);
-                        return dt;
+                        while (reader.Read())
+                        {
+                            data.Add(new Dictionary<string, object>());
+                            for (var i = 0; i < reader.FieldCount; i++)
+                                data[data.Count - 1].Add(reader.GetName(i), reader[i]);
+                        }
                     }
                 }
             }
+
+            return data;
         }
 
         /// <summary>
@@ -464,7 +503,6 @@ VALUES
         /// <param name="databaseName">Specifies database name for restore</param>
         /// <param name="databaseRestorePath">Specifies a path for restore file.</param>
         /// <returns>If success return true</returns>
-        // ReSharper disable once UnusedMember.Local
         private bool RestoreDatabase(string databaseFullPath, string databaseName, string databaseRestorePath = null)
         {
             try

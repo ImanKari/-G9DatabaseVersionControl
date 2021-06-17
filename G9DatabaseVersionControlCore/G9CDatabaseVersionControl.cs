@@ -9,8 +9,14 @@ using G9DatabaseVersionControlCore.Class.SmallLogger;
 using G9DatabaseVersionControlCore.DataType;
 using G9DatabaseVersionControlCore.Enums;
 
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedMemberInSuper.Global
+
 namespace G9DatabaseVersionControlCore
 {
+    /// <summary>
+    ///     A core class for database version control
+    /// </summary>
     public abstract class G9CDatabaseVersionControl
     {
         #region ### Fields And Properties ###
@@ -28,9 +34,11 @@ namespace G9DatabaseVersionControlCore
                 ? Assembly.GetEntryAssembly()?.GetName().Version.ToString() ?? "0.0.0.0"
                 : Assembly.GetEntryAssembly().GetName().Version.ToString();
 #else
-            string.IsNullOrEmpty(Assembly.Load(new AssemblyName(nameof(G9LogManagement))).GetName().Version.ToString())
-                ? Assembly.Load(new AssemblyName(nameof(G9LogManagement)))?.GetName().Version.ToString() ?? "0.0.0.0"
-                : Assembly.Load(new AssemblyName(nameof(G9LogManagement))).GetName().Version.ToString();
+            string.IsNullOrEmpty(Assembly.Load(new AssemblyName(nameof(G9CDatabaseVersionControl))).GetName().Version
+                .ToString())
+                ? Assembly.Load(new AssemblyName(nameof(G9CDatabaseVersionControl)))?.GetName().Version.ToString() ??
+                  "0.0.0.0"
+                : Assembly.Load(new AssemblyName(nameof(G9CDatabaseVersionControl))).GetName().Version.ToString();
 #endif
 
         /// <summary>
@@ -89,7 +97,7 @@ namespace G9DatabaseVersionControlCore
         public readonly string CompanyName;
 
         /// <summary>
-        /// Specifies current database version
+        ///     Specifies current database version
         /// </summary>
         public string CurrentDatabaseVersion { protected set; get; }
 
@@ -121,13 +129,13 @@ namespace G9DatabaseVersionControlCore
             ProjectName = projectName ?? throw new ArgumentNullException(nameof(projectName));
             DatabaseName = databaseName ?? throw new ArgumentNullException(nameof(databaseName));
             CompanyName = companyName ?? "G9TM";
-            CashTotalData();
+            CacheTotalData();
         }
 
         /// <summary>
-        ///     Method to cash total data
+        ///     Method to cache total data
         /// </summary>
-        private void CashTotalData()
+        private void CacheTotalData()
         {
             try
             {
@@ -176,8 +184,8 @@ namespace G9DatabaseVersionControlCore
                         try
                         {
                             folderVersion = folderName.Substring(0, 7);
-                            // ReSharper disable once ReturnValueOfPureMethodIsNotUsed
-                            int.Parse(folderVersion.Replace(".", string.Empty));
+                            if (!int.TryParse(folderVersion.Replace(".", string.Empty), out _))
+                                throw new Exception("Incorrect folder name!");
                             folderDateTime =
                                 DateTime.Parse(
                                     $"{folderName.Substring(8, 4)}/{folderName.Substring(12, 2)}/{folderName.Substring(14, 2)}",
@@ -204,9 +212,17 @@ namespace G9DatabaseVersionControlCore
             }
             catch (Exception e)
             {
-                e.G9SmallLogException("Error On Cash Data");
+                e.G9SmallLogException("Error On Cache Data");
                 throw;
             }
+        }
+
+        /// <summary>
+        ///     Method to reset cache data
+        /// </summary>
+        public void ResetCacheData()
+        {
+            CacheTotalData();
         }
 
         /// <summary>
@@ -314,6 +330,15 @@ namespace G9DatabaseVersionControlCore
         }
 
         /// <summary>
+        ///     Method to check update exist
+        /// </summary>
+        /// <returns></returns>
+        public bool CheckUpdateExist()
+        {
+            return GetCountOfUpdateFiles() > 0;
+        }
+
+        /// <summary>
         ///     Method to get project names
         /// </summary>
         /// <returns>Array of project names</returns>
@@ -330,7 +355,8 @@ namespace G9DatabaseVersionControlCore
         {
             try
             {
-                return RemovePreFixPath(GetFolderNamesFromPath(databaseUpdateFilesFullPath ?? DefaultDatabaseUpdateFilesFullPath));
+                return RemovePreFixPath(
+                    GetFolderNamesFromPath(databaseUpdateFilesFullPath ?? DefaultDatabaseUpdateFilesFullPath));
             }
             catch (Exception e)
             {
@@ -392,7 +418,7 @@ namespace G9DatabaseVersionControlCore
         /// </summary>
         /// <param name="pathArray">Specifies path array</param>
         /// <returns>Get last name from path</returns>
-        private static IList<string> RemovePreFixPath(IList<string> pathArray)
+        private static IList<string> RemovePreFixPath(IEnumerable<string> pathArray)
         {
             return pathArray.Select(s => s.Remove(0, s.LastIndexOf(Path.DirectorySeparatorChar) + 1)).ToArray();
         }
@@ -537,6 +563,12 @@ namespace G9DatabaseVersionControlCore
         protected abstract void CreateRequirementTables();
 
         /// <summary>
+        /// Method to remove tables of database version control system from database
+        /// </summary>
+        /// <returns>If successful return true</returns>
+        public abstract bool RemoveTablesOfDatabaseVersionControlFromDatabase();
+
+        /// <summary>
         ///     Method for handle and execute new update script on a database
         /// </summary>
         public abstract void StartUpdate();
@@ -553,9 +585,18 @@ namespace G9DatabaseVersionControlCore
         /// <returns>If success to get backup return true</returns>
         public abstract bool BackupDatabase(string backupPath);
 
-        protected abstract void ExecuteQueryWithoutResult(string query);
+        /// <summary>
+        ///     Method to execute query on database without result
+        /// </summary>
+        /// <param name="query">Specifies query</param>
+        public abstract void ExecuteQueryWithoutResult(string query);
 
-        protected abstract object ExecuteQueryWithResult(string query);
+        /// <summary>
+        ///     Method to execute query on database with result
+        /// </summary>
+        /// <param name="query">Specifies query</param>
+        /// <returns>Received data from query - List specifies rows and dictionary specifies column and value</returns>
+        public abstract List<Dictionary<string, object>> ExecuteQueryWithResult(string query);
 
         #endregion
     }

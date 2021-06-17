@@ -30,8 +30,12 @@
     <None Remove="DatabaseUpdateFiles\Project3\1.0.0.0-20210612\002- Sample.sql" />
     <None Remove="DatabaseUpdateFiles\Project2\1.0.0.0-20210612\001- Help.sql" />
     <None Remove="DatabaseUpdateFiles\Project2\1.0.0.0-20210612\002- Sample.sql" />
-    <None Remove="DatabaseUpdateFiles\Project1\1.0.0.0-20210612\001- Help.sql" />
-    <None Remove="DatabaseUpdateFiles\Project1\1.0.0.0-20210612\002- Sample.sql" />
+    <None Remove="DatabaseUpdateFiles\Project1\1.0.0.0-20210611\001- Help.sql" />
+    <None Remove="DatabaseUpdateFiles\Project1\1.0.0.0-20210611\002- Sample.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\G9DatabaseVersionControlCore.SqlServer\G9DatabaseVersionControlCore.SqlServer.csproj" />
   </ItemGroup>
 
 </Project>

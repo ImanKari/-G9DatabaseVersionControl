@@ -249,11 +249,11 @@ namespace G9DatabaseVersionControlCore.Class.SmallLogger
 
                 lock (WriteFileLock)
                 {
-                    using (var tw =
-                        new StreamWriter(LogFullPath, true, Encoding))
+                    using (var os = new FileStream(LogFullPath, FileMode.OpenOrCreate))
                     {
-                        tw.Write(sb.ToString());
-                        tw.Close();
+                        os.Seek(0, SeekOrigin.End);
+                        var dataByte = Encoding.GetBytes(sb.ToString());
+                        os.Write(dataByte, 0, dataByte.Length);
                     }
                 }
             }
