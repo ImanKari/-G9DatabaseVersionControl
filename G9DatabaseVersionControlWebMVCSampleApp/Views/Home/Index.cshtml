@@ -1,0 +1,254 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<!-- Background Images -->
+<img class="Install_BG_Image" src="Images/Install_Update_Convert/BG/2.jpg" />
+<img class="Install_BG_Image" src="Images/Install_Update_Convert/BG/5.jpg" />
+<img class="Install_BG_Image" src="Images/Install_Update_Convert/BG/6.jpg" />
+<img class="Install_BG_Image" src="Images/Install_Update_Convert/BG/7.jpg" />
+<img class="Install_BG_Image" src="Images/Install_Update_Convert/BG/8.jpg" />
+<img class="Install_BG_Image" src="Images/Install_Update_Convert/BG/1.jpg" />
+<img class="Install_BG_Image" src="Images/Install_Update_Convert/BG/3.jpg" />
+<img class="Install_BG_Image" src="Images/Install_Update_Convert/BG/4.jpg" />
+
+<!-- Main Div -->
+<div class="MainDiv">
+
+    <div class="MainDiv_CenterDiv_ItemCount">
+        <div class="MainDiv_CenterDiv_ItemCount_ChildDiv">
+            <lable class="MainDiv_CenterDiv_Lable">
+                Number of items in the old database for transfer.
+            </lable>
+            <br />
+            <lable class="MainDiv_CenterDiv_Lable" id="MainDiv_CenterDiv_ItemCount_ChildDiv_CountOfItem">
+                856452144842
+            </lable>
+        </div>
+    </div>
+
+    <!-- Center Div -->
+    <div class="MainDiv_CenterDiv">
+
+        <!-- Header With Logo-->
+        <div class="MainDiv_CenterDiv_Header">
+            <label class="MainDiv_CenterDiv_Header_TitleIMG">Database Control Version</label>
+            <lable id="Lable_For_Timer"></lable>
+        </div>
+
+        <!-- Step 1: Connection String -->
+        <div class="MainDiv_CenterDiv_SetConnectionString Pages">
+
+            <div class="MainDiv_CenterDiv_Row" style="margin: 0px; margin-top: -10px;">
+                <label class="MainDiv_CenterDiv_LableBig">Database Connection Settings</label>
+            </div>
+
+            <div class="MainDiv_CenterDiv_SetConnectionString_Area">
+
+                <div class="MainDiv_CenterDiv_Row">
+
+                    <div class="MainDiv_CenterDiv_Col">
+                        <label>Data Source</label>
+                        <br />
+                        <input id="DB_DataSource" type="text" value="GAM3R-IK\MSSQLSERVER2019" />
+                    </div>
+
+                    <div class="MainDiv_CenterDiv_Col">
+                        <label>User Id</label>
+                        <br />
+                        <input id="DB_UserId" type="text" value="sa" />
+                    </div>
+                </div>
+
+                <div class="MainDiv_CenterDiv_Row" style="height: 10px;">
+                    <label>Password</label>
+                    <br />
+                    <input id="DB_Password" type="password" value="Pass1234" />
+                </div>
+            </div>
+
+            <button class="MainDiv_CenterDiv_BTN" id="Btn_CheckConnectionString">Continue</button>
+
+        </div>
+
+        <!-- Step 2: Specifies type of install -->
+        <div class="MainDiv_CenterDiv_SetInstallData Pages">
+
+            <div class="MainDiv_CenterDiv_Cul" itemtype="1">
+                <img class="MainDiv_CenterDiv_Row_InstallType" src="Images/Install_Update_Convert/InstallItem/1.png" />
+                <div class="MainDiv_CenterDiv_Row">
+                    <label class="MainDiv_CenterDiv_Lable FullWidth">Install software</label>
+                    <br />
+                    <label class="MainDiv_CenterDiv_LableSmall FullWidth">By choosing this item a new version of the data collection software along with the empty database will be installed. The bank will then be automatically updated to the latest version.</label>
+                </div>
+            </div>
+
+            <div class="MainDiv_CenterDiv_Cul" ItemType="3">
+                <img class="MainDiv_CenterDiv_Row_InstallType" src="Images/Install_Update_Convert/InstallItem/3.png" />
+                <div class="MainDiv_CenterDiv_Row">
+                    <label class="MainDiv_CenterDiv_Lable FullWidth">Web Update</label>
+                    <br />
+                    <label class="MainDiv_CenterDiv_LableSmall FullWidth">If you have previously had a copy of Windows Data logger Software and need to update it to the latest version, you should use this version.</label>
+                </div>
+            </div>
+
+            <div class="MainDiv_CenterDiv_Cul" ItemType="2">
+                <img class="MainDiv_CenterDiv_Row_InstallType" src="Images/Install_Update_Convert/InstallItem/2.png" />
+                <div class="MainDiv_CenterDiv_Row">
+                    <label class="MainDiv_CenterDiv_Lable FullWidth">Convert from Old to New</label>
+                    <br />
+                    <label class="MainDiv_CenterDiv_LableSmall FullWidth">If you have previously had a copy of Windows Digital Logsheet Software and need to update it to the latest version, use this version.</label>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Step 3: Get database names -->
+        <div class="MainDiv_CenterDiv_SetDataForInstall Pages">
+
+            <div id="MainDiv_CenterDiv_SetDataForInstall_NewDBDiv">
+                <div class="MainDiv_CenterDiv_Row">
+                    <label class="MainDiv_CenterDiv_Lable">New database Name</label>
+                </div>
+
+                <div class="MainDiv_CenterDiv_Row">
+                    <input id="Input_NewDBName" value="NewPdlWeb" class="MainDiv_CenterDiv_SetDataForInstall_Input" type="text" />
+                </div>
+            </div>
+
+            <div id="MainDiv_CenterDiv_SetDataForInstall_OldDBDiv">
+                <div class="MainDiv_CenterDiv_Row">
+                    <label class="MainDiv_CenterDiv_Lable">Old database Name</label>
+                </div>
+
+                <div class="MainDiv_CenterDiv_Row">
+                    <input id="Input_OldDBName" class="MainDiv_CenterDiv_SetDataForInstall_Input" type="text" />
+                </div>
+            </div>
+
+            <div class="MainDiv_CenterDiv_Row">
+                <button class="MainDiv_CenterDiv_BTN" id="Btn_NextStep4">Continue installation</button>
+                <button class="MainDiv_CenterDiv_BTN" id="Btn_BackStep2">Back To Previous</button>
+            </div>
+
+
+        </div>
+
+        <!-- Step 4: Get company name -->
+        <div class="MainDiv_CenterDiv_SetSoftwareName Pages">
+
+            <div style="margin-bottom: 39px; margin-top: 39px;">
+                <div class="MainDiv_CenterDiv_Row">
+                    <label class="MainDiv_CenterDiv_Lable">Customer Company Name</label>
+                </div>
+
+                <div class="MainDiv_CenterDiv_Row">
+                    <input id="Input_CompanyName" class="MainDiv_CenterDiv_SetDataForInstall_Input" type="text" />
+                </div>
+            </div>
+
+
+            <div class="MainDiv_CenterDiv_Row">
+
+                <div id="Input_SetDbURL_Message">Database path specification is not mandatory. In case not specified, the database will be built into the default database location.</div>
+
+                <button class="MainDiv_CenterDiv_BTN" id="Input_SetDbURL">Specify Database Path</button>
+                <input placeholder="C:/FolderName" class="hidden" id="Input_SetDbURL_Text" type="text" />
+                <br />
+                <button class="MainDiv_CenterDiv_BTN" id="Btn_StartInstall">Start Installation</button>
+                <button class="MainDiv_CenterDiv_BTN" id="Btn_BackStep3">Back To Previous</button>
+            </div>
+
+        </div>
+
+        <!-- Step 5: Initialize and start  -->
+        <div class="MainDiv_CenterDiv_StartInstall Pages">
+
+            <img iteminf="Shadow" class="MainDiv_CenterDiv_StartInstall_IMG" src="Images/Install_Update_Convert/Items/MainShadow.png" />
+
+            <img iteminf="A1" class="MainDiv_CenterDiv_StartInstall_IMG" src="Images/Install_Update_Convert/Items/A1.png" />
+            <img iteminf="A2" class="MainDiv_CenterDiv_StartInstall_IMG" src="Images/Install_Update_Convert/Items/A2.png" />
+            <img iteminf="A3" class="MainDiv_CenterDiv_StartInstall_IMG" src="Images/Install_Update_Convert/Items/A3.png" />
+
+            <img iteminf="B1" class="MainDiv_CenterDiv_StartInstall_IMG" src="Images/Install_Update_Convert/Items/B1.png" />
+            <img iteminf="B2" class="MainDiv_CenterDiv_StartInstall_IMG" src="Images/Install_Update_Convert/Items/B2.png" />
+            <img iteminf="B3" class="MainDiv_CenterDiv_StartInstall_IMG" src="Images/Install_Update_Convert/Items/B3.png" />
+
+            <img iteminf="C1" class="MainDiv_CenterDiv_StartInstall_IMG" src="Images/Install_Update_Convert/Items/C1.png" />
+            <img iteminf="C2" class="MainDiv_CenterDiv_StartInstall_IMG" src="Images/Install_Update_Convert/Items/C2.png" />
+            <img iteminf="C3" class="MainDiv_CenterDiv_StartInstall_IMG" src="Images/Install_Update_Convert/Items/C3.png" />
+
+            <img iteminf="D1" class="MainDiv_CenterDiv_StartInstall_IMG" src="Images/Install_Update_Convert/Items/D1.png" />
+            <img iteminf="D2" class="MainDiv_CenterDiv_StartInstall_IMG" src="Images/Install_Update_Convert/Items/D2.png" />
+            <img iteminf="D3" class="MainDiv_CenterDiv_StartInstall_IMG" src="Images/Install_Update_Convert/Items/D3.png" />
+
+            <div class="MainDiv_CenterDiv_StartInstall_Proccess">
+                <label id="Label_InstallProcess" class="MainDiv_CenterDiv_StartInstall_Proccess_Lable">0%</label>
+            </div>
+
+            <div class="MainDiv_CenterDiv_StartInstall_Infromation">
+
+                <div class="row">
+                    <img class="MainDiv_CenterDiv_StartInstall_Infromation_LodingIMG" src="Images/Install_Update_Convert/Loading.gif" />
+                </div>
+
+                <div class="row">
+                    <label id="Label_InstallTitle" class="MainDiv_CenterDiv_Lable">Examination and preparation.</label>
+                    <br />
+                    <label id="Label_InstallInfo" class="MainDiv_CenterDiv_LableSmall">Items must be inspected and prepared before installation so that there is no problem with the installation process.</label>
+                </div>
+            </div>
+
+
+        </div>
+
+        <!-- Step 6: Finish and show final result -->
+        <div class="MainDiv_CenterDiv_FinishInstall Pages">
+            <div class="MainDiv_CenterDiv_FinishInstall_LineColor"></div>
+            <div class="row">
+                <label class="MainDiv_CenterDiv_LableBig">Delete Successful</label>
+            </div>
+            <div class="row">
+                <label class="MainDiv_CenterDiv_Lable">The number of failed scripts</label>
+                <br />
+                <label id="MainDiv_CenterDiv_FinishInstall_ScriptErrorCount" class="MainDiv_CenterDiv_Lable">0</label>
+            </div>
+
+            <form id="form1" runat="server" autocomplete="off">
+                <div class="row">
+                    <button id="MainDiv_CenterDiv_FinishInstall_BtnError" runat="server" OnServerClick="MainDiv_CenterDiv_FinishInstall_BtnError_OnServerClick" class="MainDiv_CenterDiv_BTN">Login to Site</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Div: Loading page -->
+        <div class="MainDiv_CenterDiv_Loading Pages">
+            <img class="MainDiv_CenterDiv_Loading_IMG" src="Images/Install_Update_Convert/Loading.gif" />
+        </div>
+
+        <!-- Div: Show message -->
+        <div class="MainDiv_CenterDiv_MessageDiv">
+            <div class="MainDiv_CenterDiv_MessageDiv_MainDiv">
+
+                <div class="MainDiv_CenterDiv_Row">
+                    <label class="MainDiv_CenterDiv_LableSmall" id="MainDiv_CenterDiv_MessageDiv_MainDiv_Lable"></label>
+                </div>
+
+                <div class="MainDiv_CenterDiv_Row hidden" id="MainDiv_CenterDiv_Row_Close">
+                    <button class="MainDiv_CenterDiv_BTNSmall" id="MainDiv_CenterDiv_MessageDiv_MainDiv_Close">Close</button>
+                </div>
+
+                <div class="MainDiv_CenterDiv_Row hidden" id="MainDiv_CenterDiv_Row_AcceptAndDenied">
+                    <button class="MainDiv_CenterDiv_BTNSmall" id="MainDiv_CenterDiv_MessageDiv_MainDiv_Accept">Confirmed</button>
+                    <button class="MainDiv_CenterDiv_BTNSmall" id="MainDiv_CenterDiv_MessageDiv_MainDiv_Denied">Cancel</button>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Logo-->
+        <img class="MainDiv_CenterDiv_LogoImg" src="Images/Install_Update_Convert/LOGO.png" />
+
+    </div>
+
+</div>

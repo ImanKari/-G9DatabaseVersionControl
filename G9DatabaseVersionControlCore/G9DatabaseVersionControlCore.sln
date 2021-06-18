@@ -19,6 +19,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1- DatabaseSupport", "1- Da
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "G9DatabaseVersionControlCore.SqlServer", "..\G9DatabaseVersionControlCore.SqlServer\G9DatabaseVersionControlCore.SqlServer.csproj", "{464DD6B5-4CF6-4E62-9DBD-4875C6353D7F}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "G9DatabaseVersionControlWebMVCSampleApp", "..\G9DatabaseVersionControlWebMVCSampleApp\G9DatabaseVersionControlWebMVCSampleApp.csproj", "{ED594849-47A6-4BA2-97A4-A641431AA7D7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,6 +43,10 @@ Global
 		{464DD6B5-4CF6-4E62-9DBD-4875C6353D7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{464DD6B5-4CF6-4E62-9DBD-4875C6353D7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{464DD6B5-4CF6-4E62-9DBD-4875C6353D7F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED594849-47A6-4BA2-97A4-A641431AA7D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED594849-47A6-4BA2-97A4-A641431AA7D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED594849-47A6-4BA2-97A4-A641431AA7D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED594849-47A6-4BA2-97A4-A641431AA7D7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -50,6 +56,7 @@ Global
 		{B28918B7-21C0-492A-811F-BEB4A76EC2DB} = {AD0AC159-3BC1-4CA5-AD31-F7238D6A9ABF}
 		{1244EF67-045A-43D1-9A24-834D6F3889BE} = {2381E080-8975-4F35-A34F-B74471210760}
 		{464DD6B5-4CF6-4E62-9DBD-4875C6353D7F} = {C8956F96-98F1-4B04-8ECF-EAC24BEF37FA}
+		{ED594849-47A6-4BA2-97A4-A641431AA7D7} = {2381E080-8975-4F35-A34F-B74471210760}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DCDB5801-565A-4A40-A04E-7D122FF55D93}

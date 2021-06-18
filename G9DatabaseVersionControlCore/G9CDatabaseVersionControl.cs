@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Text;
 using G9DatabaseVersionControlCore.Class.SmallLogger;
 using G9DatabaseVersionControlCore.DataType;
+using G9DatabaseVersionControlCore.DataType.AjaxDataType;
 using G9DatabaseVersionControlCore.Enums;
 
 // ReSharper disable UnusedMember.Global
@@ -79,7 +80,7 @@ namespace G9DatabaseVersionControlCore
         /// <summary>
         ///     Specifies last status of task
         /// </summary>
-        private G9DtLastTaskStatus _lastTaskStatus;
+        private G9DtTaskAnswer _lastTaskStatus;
 
         /// <summary>
         ///     Specifies project name
@@ -478,7 +479,7 @@ namespace G9DatabaseVersionControlCore
         {
             try
             {
-                _lastTaskStatus = new G9DtLastTaskStatus
+                _lastTaskStatus = new G9DtTaskAnswer
                 {
                     Success = true,
                     StepOfInstall = status,
@@ -501,7 +502,7 @@ namespace G9DatabaseVersionControlCore
         {
             try
             {
-                _lastTaskStatus = new G9DtLastTaskStatus
+                _lastTaskStatus = new G9DtTaskAnswer
                 {
                     Success = true,
                     StepOfInstall = _lastTaskStatus.StepOfInstall,
@@ -521,7 +522,7 @@ namespace G9DatabaseVersionControlCore
         ///     Method to get last task status
         /// </summary>
         /// <returns></returns>
-        public G9DtLastTaskStatus GetLastTaskStatus()
+        public G9DtTaskAnswer GetLastTaskStatus()
         {
             try
             {
@@ -529,7 +530,7 @@ namespace G9DatabaseVersionControlCore
             }
             catch (Exception e)
             {
-                return new G9DtLastTaskStatus
+                return new G9DtTaskAnswer
                 {
                     Message = e.Message,
                     FatalErrorStopInstall = true,

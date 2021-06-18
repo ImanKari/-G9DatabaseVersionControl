@@ -1,8 +1,8 @@
 ﻿using G9DatabaseVersionControlCore.Enums;
 
-namespace G9DatabaseVersionControlCore.DataType
+namespace G9DatabaseVersionControlCore.DataType.AjaxDataType
 {
-    public struct G9DtLastTaskStatus
+    public struct G9DtTaskAnswer
     {
         /// <summary>
         ///     Specifies task is success

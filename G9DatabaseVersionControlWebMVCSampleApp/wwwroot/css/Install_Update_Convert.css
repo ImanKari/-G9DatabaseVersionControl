@@ -1,0 +1,426 @@
+﻿.hidden { display: none !important; }
+
+.FullWidth {
+    position: relative;
+    width: 100% !important;
+}
+
+body {
+    background-color: #222;
+    direction: ltr;
+    font-family: Yekan, Tahoma;
+    margin: 0;
+    padding: 0;
+}
+
+.Install_BG_Image {
+    height: 120%;
+    left: 0;
+    position: fixed;
+    top: 0;
+    width: 120%;
+}
+
+.MainDiv {
+    align-items: center;
+    display: flex;
+    height: 100%;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+    position: fixed;
+    text-align: center;
+    width: 100%;
+}
+
+.MainDiv_CenterDiv {
+    background-color: #eeeeee;
+    background-color: rgba(238, 238, 238, 0.72);
+    border-radius: 9px;
+    box-shadow: 0 0 9px 2px #222;
+    height: 0;
+    margin: 0;
+    overflow: hidden;
+    padding: 0;
+    position: relative;
+    text-align: center;
+    width: 700px;
+}
+
+.MainDiv_CenterDiv_ItemCount {
+    align-items: center;
+    display: flex;
+    height: 400px;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    text-align: center;
+    width: 700px;
+}
+
+.MainDiv_CenterDiv_ItemCount_ChildDiv {
+    background-color: #eeeeee;
+    background-color: rgba(238, 238, 238, 0.72);
+    border-radius: 6px 6px 0 0;
+    bottom: 400px;
+    box-shadow: 0 0 9px 2px #222;
+    height: 0;
+    position: absolute;
+    width: 400px;
+}
+
+.MainDiv_CenterDiv_Header {
+    position: relative;
+    width: 100%;
+}
+
+.MainDiv_CenterDiv_Header_TitleIMG {
+    align-items: center;
+    color: #ffffff;
+    display: flex;
+    font-size: 1.69vw;
+    font-weight: 700;
+    justify-content: center;
+    margin-bottom: 0;
+    margin-top: 23px;
+    position: relative;
+    text-align: center;
+    text-shadow: 1px 1px 1px #525252, 1px 2px 1px #525252, 1px 3px 1px #525252, 1px 4px 1px #ffecec, 1px 5px 1px #525252, 1px 6px 1px #525252, 1px 7px 1px #525252, 1px 8px 1px #525252, 1px 9px 1px #525252, 1px 10px 1px #525252, 1px 18px 6px #101010, 1px 22px 10px #101010, 1px 25px 35px #101010, 1px 30px 60px #101010;
+    text-shadow: 1px 1px 1px #525252, 1px 2px 1px #525252, 1px 3px 1px #525252, 1px 4px 1px #ffecec, 1px 5px 1px #525252, 1px 6px 1px #525252, 1px 7px 1px #525252, 1px 8px 1px #525252, 1px 9px 1px #525252, 1px 10px 1px #525252, 1px 18px 6px rgba(16, 16, 16, 0.40), 1px 22px 10px rgba(16, 16, 16, 0.20), 1px 25px 35px rgba(16, 16, 16, 0.20), 1px 30px 60px rgba(16, 16, 16, 0.40);
+    text-transform: uppercase;
+    width: 100%;
+}
+
+.MainDiv_CenterDiv_MessageDiv {
+    background-color: #222222;
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+}
+
+.MainDiv_CenterDiv_MessageDiv_MainDiv {
+    background-color: slategray;
+    box-shadow: 0 3px 9px 3px #222;
+    color: #eee;
+    height: 99px;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+}
+
+.MainDiv_CenterDiv_Row {
+    color: #222;
+    line-height: 26px;
+    padding-bottom: 9px;
+    padding-top: 9px;
+    position: relative;
+    width: 100%;
+}
+
+.MainDiv_CenterDiv_Col {
+    float: left;
+    padding-bottom: 9px;
+    padding-top: 9px;
+    position: relative;
+    width: 50%;
+}
+
+.MainDiv_CenterDiv_Lable {
+    font-family: Yekan, Tahoma;
+    font-size: 16px;
+    font-weight: bold;
+    position: relative;
+}
+
+.MainDiv_CenterDiv_LableBig {
+    font-family: Yekan, Tahoma;
+    font-size: 24px;
+    font-weight: bold;
+    position: relative;
+}
+
+.MainDiv_CenterDiv_LableSmall {
+    font-family: Yekan, Tahoma;
+    font-size: 12px;
+    font-weight: bold;
+    position: relative;
+}
+
+.MainDiv_CenterDiv_BTN, .MainDiv_CenterDiv_BTNSmall {
+    background-color: #ffa400;
+    border: none;
+    border-radius: 4px;
+    box-shadow: 0 0 1px 1px #222;
+    color: #222;
+    color: #eeeeee;
+    cursor: pointer;
+    font-family: Yekan, Tahoma;
+    font-size: 16px;
+    font-weight: bold;
+    height: 39px;
+    margin-left: 6px;
+    margin-right: 6px;
+    margin-top: 19px;
+    overflow: hidden;
+    position: relative;
+    width: 199px;
+}
+
+.MainDiv_CenterDiv_BTN:hover {
+    background-color: #ffa433;
+    box-shadow: 0 0 3px 1px #222;
+}
+
+#Input_SetDbURL { margin: 0; }
+
+#Input_SetDbURL_Message {
+    background-color: #ff003a;
+    box-shadow: 0 0 1px 0 #222;
+    color: #eeeeee;
+    font-size: 12px;
+    padding: 6px;
+    position: absolute;
+    top: -39px;
+    width: 100%;
+}
+
+#Input_SetDbURL_Text {
+    border: 1px #222 solid;
+    border-radius: 3px;
+    direction: ltr;
+    font-weight: bold;
+    height: 36px;
+    padding: 6px;
+    position: relative;
+    text-align: left;
+    width: 56%;
+}
+
+.MainDiv_CenterDiv_BTNSmall {
+    background-color: #bbb;
+    font-size: 12px;
+    height: 29px;
+    margin-left: 3px;
+    margin-right: 3px;
+    margin-top: 3px;
+    width: 99px;
+}
+
+.MainDiv_CenterDiv_BTNSmall:hover {
+    background-color: #ccc;
+    box-shadow: 0 0 3px 1px #222;
+}
+
+.MainDiv_CenterDiv_BGIMG {
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+}
+
+.MainDiv_CenterDiv_LogoImg {
+    bottom: 10px;
+    left: 20px;
+    position: absolute;
+    width: 100px;
+}
+
+.MainDiv_CenterDiv_SetConnectionString {
+    position: relative;
+    top: 19px;
+    width: 100%;
+}
+
+.MainDiv_CenterDiv_SetConnectionString_Area {
+    margin: 0 auto;
+    margin-top: -16px;
+    position: relative;
+    width: 80%;
+}
+
+.MainDiv_CenterDiv_SetConnectionString_Area label {
+    font-size: 14px;
+    position: relative;
+}
+
+.MainDiv_CenterDiv_SetConnectionString_Area input {
+    background-color: #eeeeee;
+    background-color: rgba(238, 238, 238, 0.72);
+    border: solid #222 1px;
+    border-radius: 3px;
+    height: 26px;
+    position: relative;
+    text-align: center;
+    width: 90%;
+}
+
+.MainDiv_CenterDiv_SetConnectionString_TextArea {
+    border: 1px #222 solid;
+    border-radius: 6px;
+    direction: ltr;
+    font-weight: bold;
+    font-weight: bold;
+    max-height: 90px;
+    padding-bottom: 19px;
+    padding-top: 19px;
+    position: relative;
+    resize: none;
+    text-align: center;
+    width: 60%;
+}
+
+/*قسمت دوم انتخاب نو نصب*/
+
+.MainDiv_CenterDiv_SetInstallData {
+    position: relative;
+    text-align: center;
+    width: 100%;
+}
+
+.MainDiv_CenterDiv_Cul {
+    border-radius: 3px;
+    cursor: pointer;
+    float: left;
+    margin: 15px;
+    margin-top: 16px;
+    overflow: hidden;
+    padding: 0;
+    position: relative;
+    text-align: center;
+    width: 29%;
+    /*background-color: #ffa400;*/
+}
+
+.MainDiv_CenterDiv_Cul label { cursor: pointer; }
+
+.MainDiv_CenterDiv_Cul:hover { box-shadow: 0 0 1px 1px #fff; }
+
+.MainDiv_CenterDiv_Row_InstallType {
+    position: relative;
+    width: 60px;
+}
+
+
+
+
+
+
+/*قسمت سوم وارد کردن داده های مورد نیاز برای تصب*/
+
+.MainDiv_CenterDiv_SetDataForInstall {
+    position: relative;
+    text-align: center;
+    width: 100%;
+}
+
+/*قسمت لودینگ*/
+
+.MainDiv_CenterDiv_Loading {
+    align-items: center;
+    display: flex;
+    height: 62%;
+    justify-content: center;
+    position: relative;
+    text-align: center;
+    width: 100%;
+}
+
+.MainDiv_CenterDiv_Loading_IMG { width: 260px; }
+
+.MainDiv_CenterDiv_SetDataForInstall_Input {
+    border: 1px #222 solid;
+    border-radius: 3px;
+    font-weight: bold;
+    height: 30px;
+    position: relative;
+    text-align: center;
+    width: 300px;
+}
+    
+
+.MainDiv_CenterDiv_StartInstall {
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+}
+
+
+.MainDiv_CenterDiv_StartInstall_IMG {
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+}
+
+.MainDiv_CenterDiv_StartInstall_Proccess {
+    align-items: center;
+    bottom: 30px;
+    display: flex;
+    height: 150px;
+    justify-content: center;
+    position: absolute;
+    right: 45px;
+    width: auto;
+}
+
+.MainDiv_CenterDiv_StartInstall_Proccess_Lable {
+    color: #222;
+    font-family: Tahoma;
+    font-size: 99px;
+}
+
+
+.MainDiv_CenterDiv_StartInstall_Infromation {
+    bottom: 30px;
+    height: 150px;
+    left: 45px;
+    line-height: 26px;
+    position: absolute;
+    width: 300px;
+}
+
+.MainDiv_CenterDiv_StartInstall_Infromation_LodingIMG { width: 120px; }
+
+.MainDiv_CenterDiv_FinishInstall {
+    bottom: 0;
+    height: 100%;
+    left: 0;
+    position: absolute;
+    width: 100%;
+}
+
+
+.MainDiv_CenterDiv_FinishInstall_LineColor {
+    height: 15px;
+    margin-bottom: 10px;
+    margin-top: 99px;
+    position: relative;
+    width: 100%;
+}
+
+
+#MainDiv_CenterDiv_FinishInstall_ScriptErrorCount {
+    font-size: 19px;
+    font-weight: bold;
+}
+
+#Lable_For_Timer {
+    display: inline-block;
+    display: inline-block;
+    font-family: Palatino;
+    font-size: 26px;
+    font-weight: bold;
+    position: relative;
+    top: -9px;
+    width: 100%;
+}
+
+#Btn_CheckConnectionString { top: 65px; }
