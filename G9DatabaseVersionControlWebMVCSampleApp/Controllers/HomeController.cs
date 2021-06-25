@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 using G9DatabaseVersionControlCore;
 using G9DatabaseVersionControlCore.DataType;
 using G9DatabaseVersionControlCore.DataType.AjaxDataType;
@@ -24,48 +26,29 @@ namespace G9DatabaseVersionControlWebMVCSampleApp.Controllers
         public HomeController(ILogger<HomeController> logger)
         {
             _logger = logger;
-        }
 
-        public IActionResult Index()
-        {
-            return View();
-        }
+            #region ### Map 4 project ###
 
-        [HttpPost]
-        public string G9DatabaseVersionControlHandler(string data)
-        {
-            #region ### Map 4 project for test ###
-
-            G9CDatabaseVersionControl.MapProjects(
-                // 1- Base database with backup
+            // 1- Base database not exist
+            var map1 =
                 new G9DtMap(
-                    "G9DatabaseVersionControlUnitTest",
-                    "G9DatabaseVersionControlUnitTest",
-                    @"BaseDatabaseBackup/Test.BAK",
+                    "Project3",
+                    "Project3",
                     new G9DtMapDatabaseScriptRequirements(true, true),
-                    // Custom params:
-                    @"DatabaseUpdateFiles/",
-                    false,
-                    false,
-                    "G9Schema",
-                    Encoding.UTF8,
-                    () => "9.6.3.1",
-                    (oldDbName, newDbName, actionExecuteQueryWithoutResult, funcExecuteQueryWithResult) =>
-                        // Func for convert and transfer old data from an old database to a new one
-                        new G9DtTaskResult()),
-                // 2- Base database with script
+                    productVersionFunc: GetProjectVersion);
+
+
+            // 2- Base database with backup
+            var map2 =
                 new G9DtMap(
-                    "Project1",
-                    "Project1",
-                    (customDbName, customDbPath) => $@"CREATE DATABASE [{customDbName}]
- CONTAINMENT = NONE
- ON  PRIMARY 
-( NAME = N'Test', FILENAME = N'{customDbPath ?? @"C:\Program Files\Microsoft SQL Server\MSSQL15.MSSQLSERVER2019\MSSQL\DATA"}\{customDbName}.mdf' , SIZE = 8192KB , MAXSIZE = UNLIMITED, FILEGROWTH = 65536KB )
- LOG ON 
-( NAME = N'Test_log', FILENAME = N'{customDbPath ?? @"C:\Program Files\Microsoft SQL Server\MSSQL15.MSSQLSERVER2019\MSSQL\DATA"}\{customDbName}.ldf' , SIZE = 8192KB , MAXSIZE = 2048GB , FILEGROWTH = 65536KB )
- WITH CATALOG_COLLATION = DATABASE_DEFAULT",
-                    new G9DtMapDatabaseScriptRequirements(true, true)),
-                // 3- Base database with func
+                    "G9DatabaseVersionControlWebMVCSampleApp",
+                    "Version",
+                    @"BaseDatabaseBackup/Test.BAK",
+                    new G9DtMapDatabaseScriptRequirements(true, true));
+
+
+            // 3- Base database with func
+            var map3 =
                 new G9DtMap(
                     "Project2",
                     "Project2",
@@ -85,60 +68,86 @@ namespace G9DatabaseVersionControlWebMVCSampleApp.Controllers
                             return new G9DtTaskResult(ex.Message);
                         }
                     },
-                    new G9DtMapDatabaseScriptRequirements(true, true)),
-                // 4- Base database not exist
+                    new G9DtMapDatabaseScriptRequirements(true, true));
+
+
+            // 4- Base database with script
+            var map4 =
                 new G9DtMap(
-                    "Project3",
-                    "Project3",
-                    new G9DtMapDatabaseScriptRequirements(true, true))
-            );
+                    "Project1",
+                    "Project1",
+                    (customDbName, customDbPath) =>
+                    {
+                        return $@"CREATE DATABASE [{customDbName}]
+ CONTAINMENT = NONE
+ ON  PRIMARY 
+( NAME = N'Test', FILENAME = N'{customDbPath}\{customDbName}.mdf' , SIZE = 8192KB , MAXSIZE = UNLIMITED, FILEGROWTH = 65536KB )
+ LOG ON 
+( NAME = N'Test_log', FILENAME = N'{customDbPath}\{customDbName}.ldf' , SIZE = 8192KB , MAXSIZE = 2048GB , FILEGROWTH = 65536KB )
+ WITH CATALOG_COLLATION = DATABASE_DEFAULT";
+                    },
+                    new G9DtMapDatabaseScriptRequirements(true, true),
+
+                    // Custom params:
+                    @"DatabaseUpdateFiles/",
+                    false,
+                    false,
+                    "dbo",
+                    Encoding.UTF8,
+                    GetProjectVersion,
+                    (dbName, actionExecuteQueryWithoutResult, funcExecuteQueryWithResult) =>
+                    {
+                        // Custom func
+                        try
+                        {
+                            if (!funcExecuteQueryWithResult("SELECT 1 FROM sys.schemas WHERE name = 'Test'").Any())
+                                actionExecuteQueryWithoutResult("CREATE SCHEMA [Test]");
+                            return new G9DtTaskResult();
+                        }
+                        catch (Exception ex)
+                        {
+                            return new G9DtTaskResult(ex.Message);
+                        }
+                    });
+
+
+            G9CDatabaseVersionControl.MapProjects(map1, map2, map3, map4);
 
             #endregion
+        }
 
+        public IActionResult Index()
+        {
+            return View();
+        }
+
+        private string GetProjectVersion()
+        {
+            return
+#if (NETSTANDARD2_1 || NETSTANDARD2_0 || NETCOREAPP)
+                string.IsNullOrEmpty(Assembly.GetExecutingAssembly().GetName().Version.ToString())
+                    ? Assembly.GetEntryAssembly()?.GetName().Version?.ToString() ?? "0.0.0.0"
+                    : Assembly.GetExecutingAssembly().GetName().Version?.ToString();
+#elif (NETSTANDARD1_6 || NETSTANDARD1_5)
+        string.IsNullOrEmpty(Assembly.GetEntryAssembly().GetName().Version.ToString())
+                ? Assembly.GetEntryAssembly()?.GetName().Version?.ToString() ?? "0.0.0.0"
+                : Assembly.GetEntryAssembly().GetName().Version.ToString();
+#else
+                string.IsNullOrEmpty(Assembly.Load(new AssemblyName(nameof(HomeController))).GetName()
+                    .Version
+                    .ToString())
+                    ? Assembly.Load(new AssemblyName(nameof(HomeController)))?.GetName()?.Version
+                          .ToString() ??
+                      "0.0.0.0"
+                    : Assembly.Load(new AssemblyName(nameof(HomeController))).GetName().Version.ToString();
+#endif
+        }
+
+        [HttpPost]
+        public string G9DatabaseVersionControlHandler(string data)
+        {
             var requestPacket = JsonConvert.DeserializeObject<G9DtTaskRequest>(data);
-            switch (requestPacket.TaskRequest)
-            {
-                case G9ETaskRequest.EnterConnectionString:
-                    var checkConnectionString =
-                        JsonConvert.DeserializeObject<G9DtConnectionString>(requestPacket.JsonData);
-                    if (G9CDatabaseVersionControlCoreSQLServer.CheckConnectionString(checkConnectionString.DataSource,
-                        checkConnectionString.UserId,
-                        checkConnectionString.Password))
-                        return JsonConvert.SerializeObject(new G9DtTaskAnswer
-                        {
-                            Success = true,
-                            Data = JsonConvert.SerializeObject(G9CDatabaseVersionControl.GetAssignedMaps().Select(s =>
-                                new
-                                {
-                                    s.ProjectName,
-                                    s.DatabaseName,
-                                    ExistBaseDatabase = s.BaseDatabaseType != G9EBaseDatabaseType.NotSet,
-                                    ExistConvert = s.ConvertFromOldDbToNewDbFunc != null
-                                }
-                            ).ToArray())
-                        });
-
-                    return JsonConvert.SerializeObject(new G9DtTaskAnswer
-                    {
-                        Success = false, NeedShowMessage = true,
-                        Message = "The fields entered for connecting to the database are incorrect."
-                    });
-                case G9ETaskRequest.CheckExistDatabase:
-                    var dbExist = JsonConvert.DeserializeObject<G9DtCheckExistDatabase>(requestPacket.JsonData);
-                    if (G9CDatabaseVersionControlCoreSQLServer.CheckDatabaseExist(dbExist.DatabaseName,
-                        dbExist.DataSource, dbExist.UserId, dbExist.Password))
-                        return JsonConvert.SerializeObject(new G9DtTaskAnswer
-                        {
-                            Success = true
-                        });
-
-                    return JsonConvert.SerializeObject(new G9DtTaskAnswer
-                    {
-                        Success = false, NeedShowMessage = true, Message = "There is no database with this name."
-                    });
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            return G9CDatabaseVersionControlCoreSQLServer.HandleTaskRequest(requestPacket);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

@@ -1,0 +1,5 @@
+############################## Exception ##############################
+[2021-06-25 22:39:32]: Exception Message: Cannot open database "Version" requested by the login. The login failed.
+Login failed for user 'sa'.
+File Name: G:\Project\G9DatabaseVersionControl\G9DatabaseVersionControlCore.SqlServer\G9CDatabaseVersionControlCoreSQLServer.cs	Method Base: CheckConnectionString	Line Number: 161
+

@@ -26,18 +26,18 @@ namespace G9DatabaseVersionControlCore
         ///     Specifies default product version (Assembly version)
         /// </summary>
         public static readonly string DefaultProductVersion =
-#if (NETSTANDARD2_1 || NETSTANDARD2_0)
+#if (NETSTANDARD2_1 || NETSTANDARD2_0 || NETCOREAPP)
             string.IsNullOrEmpty(Assembly.GetExecutingAssembly().GetName().Version.ToString())
-                ? Assembly.GetEntryAssembly()?.GetName().Version.ToString() ?? "0.0.0.0"
+                ? Assembly.GetEntryAssembly()?.GetName().Version?.ToString() ?? "0.0.0.0"
                 : Assembly.GetExecutingAssembly().GetName().Version.ToString();
 #elif (NETSTANDARD1_6 || NETSTANDARD1_5)
         string.IsNullOrEmpty(Assembly.GetEntryAssembly().GetName().Version.ToString())
-                ? Assembly.GetEntryAssembly()?.GetName().Version.ToString() ?? "0.0.0.0"
+                ? Assembly.GetEntryAssembly()?.GetName().Version?.ToString() ?? "0.0.0.0"
                 : Assembly.GetEntryAssembly().GetName().Version.ToString();
 #else
             string.IsNullOrEmpty(Assembly.Load(new AssemblyName(nameof(G9CDatabaseVersionControl))).GetName().Version
                 .ToString())
-                ? Assembly.Load(new AssemblyName(nameof(G9CDatabaseVersionControl)))?.GetName().Version.ToString() ??
+                ? Assembly.Load(new AssemblyName(nameof(G9CDatabaseVersionControl)))?.GetName().Version?.ToString() ??
                   "0.0.0.0"
                 : Assembly.Load(new AssemblyName(nameof(G9CDatabaseVersionControl))).GetName().Version.ToString();
 #endif
@@ -408,7 +408,9 @@ namespace G9DatabaseVersionControlCore
         /// <returns>Get last name from path</returns>
         private static IList<string> RemovePreFixPath(IEnumerable<string> pathArray)
         {
-            return pathArray.Select(s => s.Remove(0, s.LastIndexOf(Path.DirectorySeparatorChar) + 1)).ToArray();
+            return pathArray.Select(s =>
+                s.Remove(0, s.LastIndexOf("\\", StringComparison.Ordinal) + 1)
+                    .Remove(0, s.LastIndexOf("/", StringComparison.Ordinal) + 1)).ToArray();
         }
 
         /// <summary>
@@ -570,6 +572,13 @@ namespace G9DatabaseVersionControlCore
         /// <param name="databaseRestorePath">Specifies custom restore database file path</param>
         /// <returns>If successful the method will return 'true' </returns>
         public abstract Task<bool> StartInstall(string customDatabaseName = null, string databaseRestorePath = null);
+
+        /// <summary>
+        ///     Method for execute custom task
+        /// </summary>
+        /// <param name="customDatabaseName">Specifies custom database name for restore</param>
+        /// <returns>If successful the method will return 'true' </returns>
+        public abstract Task<bool> StartCustomTask(string customDatabaseName = null);
 
         /// <summary>
         ///     Method for get backup from a database

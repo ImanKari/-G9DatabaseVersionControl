@@ -5,6 +5,40 @@ $(document).ready(function() {
     // فیلد برای نگهداری نوع نصب درخواستی که در مرحله دوم توسط کاربر مقدار دهی می شود
     var TypeOfInstall = -1;
 
+    // متغیر برای نگهداری تمام اطلاعات پروژه های در دسترس
+    var ProjectsMapData = [
+        {
+            ProjectName: "",
+            ProjectVersion: "",
+            DatabaseName: "",
+            DatabaseVersion: "",
+            ExistBaseDatabase: false,
+            ExistConvert: false,
+            EnableSetCustomDatabaseName: false,
+            EnableSetCustomDatabaseRestoreFilePath: false
+        }
+    ];
+
+    // پروژه انتخاب شده را مشخص می کند
+    var ChooseProjectIndex;
+    var ChooseProjectName;
+
+    // Enum to specifies task request
+    var G9ETaskRequest = {
+        // Request for enter connection string
+        EnterConnectionString: 0,
+        // Request for check exist database
+        CheckExistDatabase: 1,
+        // Request for install software
+        InstallSoftwareAndUpdate: 2,
+        // Request for update
+        UpdateSoftware: 3,
+        // Request for custom task
+        CustomTask: 4,
+        // Request for get last status
+        CheckLastStatus: 5
+    };
+
     // تمامی صفح ها در ابتدا باید از دسترس خارج باشند.
     $(".Pages").fadeOut();
 
@@ -205,13 +239,27 @@ $(document).ready(function() {
                 DataSourceTXTB = DataSourceTXTB.replace("\\", "\\\\");
             }
 
-            SendAndReceiveDataAjax(ReadySendPacket(0,
+            SendAndReceiveDataAjax(ReadySendPacket(G9ETaskRequest.EnterConnectionString,
                     `{DataSource: '${DataSourceTXTB}',  UserId: '${$("#DB_UserId").val()}', Password: '${$(
                         "#DB_Password").val()}'}`),
                 // Success
                 function(result) {
 
                     if (result.Success) {
+                        ProjectsMapData = JSON.parse(result.Data);
+                        var existProjectWithBaseDatabase = false;
+                        var existProjectWithCustomTask = false;
+                        $.each(ProjectsMapData,
+                            function(index) {
+                                if (ProjectsMapData[index].ExistBaseDatabase)
+                                    existProjectWithBaseDatabase = true;
+                                if (ProjectsMapData[index].ExistConvert)
+                                    existProjectWithCustomTask = true;
+                            });
+                        if (!existProjectWithBaseDatabase)
+                            $(".MainDiv_CenterDiv_Cul[itemtype='1']").hide();
+                        if (!existProjectWithCustomTask)
+                            $(".MainDiv_CenterDiv_Cul[itemtype='2']").hide();
                         setTimeout(function() {
                                 $(".Btn_CheckConnectionString").css("height", "");
                                 StopLoading(function() {
@@ -259,34 +307,82 @@ $(document).ready(function() {
 
         TypeOfInstall = parseInt($(this).attr("itemtype"));
 
+        $("#ChooseProjectTbody").empty();
+        $.each(ProjectsMapData,
+            function(index) {
+                if (TypeOfInstall === 1 && ProjectsMapData[index].ExistBaseDatabase) {
+                    $("#ChooseProjectTbody").append(
+                        `<tr projectIndex="${index}" projectname="${ProjectsMapData[index].ProjectName}">
+                            <td>${ProjectsMapData[index].ProjectName}</td>
+                            <td>${ProjectsMapData[index].ProjectVersion}</td>
+                            <td>${ProjectsMapData[index].DatabaseName}</td>
+                            <td>${ProjectsMapData[index].DatabaseVersion}</td>
+                        </tr>`);
+                } else if (TypeOfInstall === 2 && ProjectsMapData[index].ExistConvert) {
+                    $("#ChooseProjectTbody").append(
+                        `<tr projectIndex="${index}" projectname="${ProjectsMapData[index].ProjectName}">
+                            <td>${ProjectsMapData[index].ProjectName}</td>
+                            <td>${ProjectsMapData[index].ProjectVersion}</td>
+                            <td>${ProjectsMapData[index].DatabaseName}</td>
+                            <td>${ProjectsMapData[index].DatabaseVersion}</td>
+                        </tr>`);
+                } else if (TypeOfInstall === 3) {
+                    $("#ChooseProjectTbody").append(
+                        `<tr projectIndex="${index}" projectname="${ProjectsMapData[index].ProjectName}">
+                            <td>${ProjectsMapData[index].ProjectName}</td>
+                            <td>${ProjectsMapData[index].ProjectVersion}</td>
+                            <td>${ProjectsMapData[index].DatabaseName}</td>
+                            <td>${ProjectsMapData[index].DatabaseVersion}</td>
+                        </tr>`);
+                }
+            });
+
         $(".MainDiv_CenterDiv_SetInstallData").fadeOut(369,
             function() {
-
-                if (TypeOfInstall == 1 || TypeOfInstall == 3) {
-                    $("#MainDiv_CenterDiv_SetDataForInstall_NewDBDiv")
-                        .css({ "margin-top": "39px", "margin-bottom": "39px" });
-                    $("#MainDiv_CenterDiv_SetDataForInstall_OldDBDiv").addClass("hidden");
-                } else {
-                    $("#MainDiv_CenterDiv_SetDataForInstall_NewDBDiv")
-                        .css({ "margin-top": "0px", "margin-bottom": "0px" });
-                    $("#MainDiv_CenterDiv_SetDataForInstall_OldDBDiv").removeClass("hidden");
-                }
-
-                $(".MainDiv_CenterDiv_SetDataForInstall").fadeIn(369);
-
+                $(".MainDiv_CenterDiv_ChooseProject").fadeIn(369);
             });
     });
 
     // ##################################################### هندلر قسمت دوم انتخاب نوع نصب #####################################################
+
+    // ##################################################### هندلر قسمت سوم وارد انتخاب پروژه  #####################################################
+
+    $(document).on("click",
+        "tr[projectname]",
+        function() {
+            ChooseProjectName = $(this).attr("projectname");
+            ChooseProjectIndex = parseInt($(this).attr("projectIndex"));
+            $("#Input_NewDBName").val(ProjectsMapData[ChooseProjectIndex].DatabaseName);
+            if (ProjectsMapData[ChooseProjectIndex].EnableSetCustomDatabaseName) {
+                $("#Input_NewDBName").prop("disabled", false);
+            } else {
+                $("#Input_NewDBName").prop("disabled", true);
+            }
+            $(".MainDiv_CenterDiv_ChooseProject").fadeOut(369,
+                function() {
+                    $(".MainDiv_CenterDiv_SetDataForInstall").fadeIn(369);
+                });
+        });
+
+    // ##################################################### هندلر قسمت سوم وارد انتخاب پروژه  #####################################################
 
 
     // ##################################################### هندلر قسمت سوم وارد کردن نام دیتابیس  #####################################################
 
     // تابع هندلر برای هندل کردن رویداد دکمه بازگشت به قبل
     $("#Btn_BackStep2").click(function() {
-        $(".MainDiv_CenterDiv_SetDataForInstall").fadeOut(369,
+        //$(".MainDiv_CenterDiv_SetDataForInstall").fadeOut(369);
+        $(".MainDiv_CenterDiv_ChooseProject").fadeOut(369,
             function() {
                 $(".MainDiv_CenterDiv_SetInstallData").fadeIn(369);
+            });
+    });
+
+    $("#Btn_BackStep2_1").click(function() {
+        //$(".MainDiv_CenterDiv_SetDataForInstall").fadeOut(369);
+        $(".MainDiv_CenterDiv_SetDataForInstall").fadeOut(369,
+            function() {
+                $(".MainDiv_CenterDiv_ChooseProject").fadeIn(369);
             });
     });
 
@@ -296,26 +392,13 @@ $(document).ready(function() {
     });
 
     function HandleSelectDatabaseName() {
-        if (TypeOfInstall == 2) {
-            if ($("#Input_NewDBName").val() == null ||
-                $("#Input_NewDBName").val().trim().length == 0 ||
-                $("#Input_OldDBName").val() == null ||
-                $("#Input_OldDBName").val().trim().length == 0) {
+        if ($("#Input_NewDBName").val() == null ||
+            $("#Input_NewDBName").val().trim().length == 0) {
 
-                ShowMessage("لطفا فیلد های خالی را پر کنید",
-                    false,
-                    true);
-                return;
-            }
-        } else {
-            if ($("#Input_NewDBName").val() == null ||
-                $("#Input_NewDBName").val().trim().length == 0) {
-
-                ShowMessage("لطفا فیلد های خالی را پر کنید",
-                    false,
-                    true);
-                return;
-            }
+            ShowMessage("لطفا فیلد های خالی را پر کنید",
+                false,
+                true);
+            return;
         }
 
         $(".MainDiv_CenterDiv_SetDataForInstall").fadeOut(369,
@@ -323,89 +406,31 @@ $(document).ready(function() {
                 StartLoading();
             });
 
+        // Custom Task
         if (TypeOfInstall == 2) {
-            CheckDbExist($("#Input_OldDBName").val(),
-                // اگر وجود داشت
-                function() {
-                    CheckDbExist($("#Input_NewDBName").val(),
-                        // اگر وجود داشت
-                        function() {
-                            ShowMessage(
-                                "نام بانک اطلاعاتی جدید جهت نصب داده ها وجود دارد، آیا می خواهید آن را حذف کنید!؟",
-                                true,
-                                false,
-                                // اگر اکسپت کرد
-                                function() {
-
-                                    SendAndReceiveDataAjax("RemoveDB",
-                                        `{'DBName': '${$("#Input_NewDBName").val()}'}`,
-                                        // Success
-                                        function(resualt) {
-                                            if (resualt.Success) {
-                                                HandleSelectDatabaseName();
-                                            } else {
-                                                setTimeout(function() {
-                                                        StopLoading(function() {
-                                                            $(".MainDiv_CenterDiv_SetDataForInstall").fadeIn(369);
-                                                        });
-                                                    },
-                                                    1696);
-                                                return;
-                                            }
-                                        },
-                                        // Error
-                                        function(resualt) {
-                                            ShowMessage(resualt,
-                                                false,
-                                                true);
-                                            setTimeout(function() {
-                                                    StopLoading(function() {
-                                                        $(".MainDiv_CenterDiv_SetDataForInstall").fadeIn(369);
-                                                    });
-                                                },
-                                                1696);
-                                            return;
-                                        });
-
-                                },
-                                // اگر اکسپت نکرد
-                                function() {
-                                    setTimeout(function() {
-                                            StopLoading(function() {
-                                                $(".MainDiv_CenterDiv_SetDataForInstall").fadeIn(369);
-                                            });
-                                        },
-                                        1696);
-                                    return;
-                                });
-                            return;
-                            // اگر وجود تداشت
-                        },
-                        function() {
-                            setTimeout(function() {
-                                    StopLoading(function() {
-                                        $(".MainDiv_CenterDiv_SetSoftwareName").fadeIn(369);
+            CheckDbExist($("#Input_NewDBName").val(),
+                // تابع برای هندل اگر وجود داشت
+                function () {
+                    StartInstallAndUpdate();
+                },
+                // تابع برای هندل در صورت عدم وجود دیتابیس
+                function () {
+                    ShowMessage("There is no database with this name.",
+                        false,
+                        true,
+                        StopLoading(function () {
+                            setTimeout(function () {
+                                    StopLoading(function () {
+                                        $(".MainDiv_CenterDiv_SetDataForInstall").fadeIn(369);
                                     });
                                 },
-                                1696);
-                        });
-                },
-                // اگر وجود نداشت
-                function() {
-
-                    ShowMessage("بانک اطلاعاتی قدیم جهت تبدیل داده ها با این نام وجود ندارد!",
-                        false,
-                        true);
-                    setTimeout(function() {
-                            StopLoading(function() {
-                                $(".MainDiv_CenterDiv_SetDataForInstall").fadeIn(369);
-                            });
-                        },
-                        1696);
-                    return;
-                });
-
-        } else if (TypeOfInstall == 3) {
+                                639);
+                        }));
+                }
+            );
+        }
+        // Update
+        else if (TypeOfInstall == 3) {
 
             CheckDbExist($("#Input_NewDBName").val(),
                 // تابع برای هندل اگر وجود داشت
@@ -414,11 +439,23 @@ $(document).ready(function() {
                 },
                 // تابع برای هندل در صورت عدم وجود دیتابیس
                 function() {
-                    // Ignore
+                    ShowMessage("There is no database with this name.",
+                        false,
+                        true,
+                        StopLoading(function() {
+                            setTimeout(function() {
+                                    StopLoading(function() {
+                                        $(".MainDiv_CenterDiv_SetDataForInstall").fadeIn(369);
+                                    });
+                                },
+                                639);
+                        }));
                 }
             );
 
-        } else if (TypeOfInstall == 1) {
+        }
+        // Install And Update
+        else if (TypeOfInstall == 1) {
 
             CheckDbExist($("#Input_NewDBName").val(),
                 // اگر وجود داشت
@@ -474,6 +511,11 @@ $(document).ready(function() {
                     // اگر وجود تداشت
                 },
                 function() {
+                    if (ProjectsMapData[ChooseProjectIndex].EnableSetCustomDatabaseRestoreFilePath) {
+                        $("#Input_SetDbURL").prop("disabled", false);
+                    } else {
+                        $("#Input_SetDbURL").prop("disabled", true);
+                    }
                     setTimeout(function() {
                             StopLoading(function() {
                                 $(".MainDiv_CenterDiv_SetSoftwareName").fadeIn(369);
@@ -486,7 +528,7 @@ $(document).ready(function() {
     }
 
     function CheckDbExist(DbName, runIfExists, runIfNotExists, runIfError) {
-        SendAndReceiveDataAjax(ReadySendPacket(1,
+        SendAndReceiveDataAjax(ReadySendPacket(G9ETaskRequest.CheckExistDatabase,
                 `{DataSource: '${DataSourceTXTB}',  UserId: '${$("#DB_UserId").val()}', Password: '${$(
                     "#DB_Password").val()}', DatabaseName: '${DbName}'}`),
             // Success
@@ -528,16 +570,6 @@ $(document).ready(function() {
 
     // تابع هندلر برای شروع نصب برنامه
     $("#Btn_StartInstall").click(function() {
-
-        if ($("#Input_CompanyName").val() == null ||
-            $("#Input_CompanyName").val().trim().length == 0) {
-
-            ShowMessage("لطفا فیلد های خالی را پر کنید",
-                false,
-                true);
-            return;
-        }
-
         StartInstallAndUpdate();
     });
 
@@ -563,30 +595,46 @@ $(document).ready(function() {
 
         var DBURL = $("#Input_SetDbURL_Text").val();
 
-        if (DBURL == null || DBURL == "") {
-            DBURL = "None";
+        if (!ProjectsMapData[ChooseProjectIndex].EnableSetCustomDatabaseRestoreFilePath ||
+            DBURL === null ||
+            DBURL === "") {
+            DBURL = null;
         } else {
             DBURL = DBURL.replaceAll("\\", "\\\\");
         }
 
+        var databaseName = $("#Input_NewDBName").val();
+        if (!ProjectsMapData[ChooseProjectIndex].EnableSetCustomDatabaseName)
+            databaseName = ProjectsMapData[ChooseProjectIndex].DatabaseName;
+
         StartLoading(function() {
-            SendAndReceiveDataAjax("StartInstall",
-                `{'CompanyName': '${$("#Input_CompanyName").val()}',  'NewDB': '${$("#Input_NewDBName").val()
-                }', 'OldDB': '${$("#Input_OldDBName").val()}' , 'oTypeOfInstall': '${TypeOfInstall - 1}', 'DBUrl': '${
-                DBURL}'}`,
-                function() {
-                    setTimeout(function() {
-                            StopLoading(function() {
-                                $(".MainDiv_CenterDiv_StartInstall").fadeIn(99,
-                                    function() {
-                                        StartInstall();
-                                    });
-                            });
-                        },
-                        3969);
+            SendAndReceiveDataAjax(ReadySendPacket(
+                TypeOfInstall == 3 ? G9ETaskRequest.UpdateSoftware :
+                TypeOfInstall == 1 ? G9ETaskRequest.InstallSoftwareAndUpdate
+                : G9ETaskRequest.CustomTask,
+                    `{DataSource: '${DataSourceTXTB}',  UserId: '${$("#DB_UserId").val()}', Password: '${
+                    $("#DB_Password").val()}',  DatabaseName: '${databaseName}',  ProjectName: '${
+                    ProjectsMapData[ChooseProjectIndex].ProjectName}',  CustomDatabaseRestorePath: ${DBURL}}`),
+                function(resualt) {
+                    if (resualt.Success) {
+                        setTimeout(function() {
+                                StopLoading(function() {
+                                    $(".MainDiv_CenterDiv_StartInstall").fadeIn(99,
+                                        function() {
+                                            StartInstall();
+                                        });
+                                });
+                            },
+                            3969);
+                    } else {
+                        $(".MainDiv_CenterDiv_SetDataForInstall").fadeIn(369);
+                        ShowMessage("نصب با مشکل مواجه شده است لطفا لاگ را چک کنید", false, true);
+                        StopLoading();
+                    }
                 },
                 function() {
-                    ShowMessage("نصب با مشکل مواجه شده است لطفا لاگ را چک کنید", false, false);
+                    $(".MainDiv_CenterDiv_SetDataForInstall").fadeIn(369);
+                    ShowMessage("نصب با مشکل مواجه شده است لطفا لاگ را چک کنید", false, true);
                     StopLoading();
                 });
         });
@@ -611,6 +659,7 @@ $(document).ready(function() {
     function StartInstall() {
 
         $(".MainDiv_CenterDiv_LogoImg").fadeOut({ duration: 1369, queue: false });
+        $(".MainDiv_CenterDiv_Header_TitleIMG").css({ "margin": "0 auto", "margin-top": "9.9px" });
         $(".MainDiv_CenterDiv_Header_TitleIMG").animate({ "top": "-=10px", "width": "-=150px" },
             { duration: 1369, queue: false });
 
@@ -644,8 +693,6 @@ $(document).ready(function() {
         $(".MainDiv_CenterDiv_StartInstall_IMG[iteminf='Shadow']").animate({ "top": "-=20px" },
             1369,
             function() {
-
-
                 ShowInstallState(FlagInstallState,
                     function() {
                         CheckLastStatusOfInstall();
@@ -671,8 +718,7 @@ $(document).ready(function() {
     // تابع برای گرفتن آخرین وضعیت نصب
     function CheckLastStatusOfInstall() {
         setTimeout(function() {
-                SendAndReceiveDataAjax("CheckLastStatusOfInstall",
-                    null,
+            SendAndReceiveDataAjax(ReadySendPacket(G9ETaskRequest.CheckLastStatus, ""),
                     // اگر تماس به درستی بر قرار شد
                     function(result) {
 
@@ -978,19 +1024,17 @@ $(document).ready(function() {
         StartLoading(function() {
             setTimeout(function() {
                     StopLoading(function() {
-                        if (LastItemReceive.NumberOfScriptError == 0) {
-                            $("#MainDiv_CenterDiv_FinishInstall_ScriptErrorCount").text("بدون مشکل");
+                        if (LastItemReceive.NumberOfErrorScript == 0) {
+                            $("#MainDiv_CenterDiv_FinishInstall_ScriptErrorCount").text("Without problem");
                             $(".MainDiv_CenterDiv_FinishInstall_LineColor, #MainDiv_CenterDiv_FinishInstall_BtnError")
                                 .css({ "background-color": "#006400" });
                         } else {
                             $("#MainDiv_CenterDiv_FinishInstall_ScriptErrorCount")
-                                .text(LastItemReceive.NumberOfScriptError);
+                                .text(LastItemReceive.NumberOfErrorScript);
                             $(".MainDiv_CenterDiv_FinishInstall_LineColor, #MainDiv_CenterDiv_FinishInstall_BtnError")
                                 .css({ "background-color": "#ff8c00" });
                         }
-
                         $(".MainDiv_CenterDiv_FinishInstall").fadeIn(963);
-
                     });
                 },
                 3963);
