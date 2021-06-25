@@ -47,7 +47,6 @@ namespace G9DatabaseVersionControlWebMVCSampleApp.Controllers
                         Success = false, NeedShowMessage = true,
                         Message = "The fields entered for connecting to the database are incorrect."
                     });
-                    break;
                 case G9ETaskRequest.CheckExistDatabase:
                     var dbExist = JsonConvert.DeserializeObject<G9DtCheckExistDatabase>(requestPacket.JsonData);
                     if (G9CDatabaseVersionControlCoreSQLServer.CheckDatabaseExist(dbExist.DatabaseName,
@@ -61,12 +60,9 @@ namespace G9DatabaseVersionControlWebMVCSampleApp.Controllers
                     {
                         Success = false, NeedShowMessage = true, Message = "There is no database with this name."
                     });
-                    break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-
-            return "Okay";
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

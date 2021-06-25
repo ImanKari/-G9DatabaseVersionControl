@@ -1,5 +1,3 @@
-using System;
-
 namespace G9DatabaseVersionControlWebMVCSampleApp.Models
 {
     public class ErrorViewModel

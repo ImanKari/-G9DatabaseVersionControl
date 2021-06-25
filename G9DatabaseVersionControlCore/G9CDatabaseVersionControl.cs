@@ -4,7 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
+using System.Threading.Tasks;
 using G9DatabaseVersionControlCore.Class.SmallLogger;
 using G9DatabaseVersionControlCore.DataType;
 using G9DatabaseVersionControlCore.DataType.AjaxDataType;
@@ -43,9 +43,9 @@ namespace G9DatabaseVersionControlCore
 #endif
 
         /// <summary>
-        ///     Specifies product version (Assembly version)
+        ///     Specifies product version
         /// </summary>
-        public readonly string ProductVersion;
+        public string ProductVersion { protected set; get; }
 
         /// <summary>
         ///     Specifies default update files full path
@@ -58,24 +58,9 @@ namespace G9DatabaseVersionControlCore
         public const string DefaultSchemaForTables = "dbo";
 
         /// <summary>
-        ///     Specifies update files full path
-        /// </summary>
-        public static string DatabaseUpdateFilesFullPath { private set; get; }
-
-        /// <summary>
-        ///     Specifies schema for create tables
-        /// </summary>
-        public readonly string SchemaForTables;
-
-        /// <summary>
         ///     Access to all projects and infos
         /// </summary>
         private Dictionary<string, G9DtProjectInfo> _totalProjects;
-
-        /// <summary>
-        ///     Specifies encoding of update file
-        /// </summary>
-        public readonly Encoding DatabaseUpdateFileEncoding;
 
         /// <summary>
         ///     Specifies last status of task
@@ -83,24 +68,19 @@ namespace G9DatabaseVersionControlCore
         private G9DtTaskAnswer _lastTaskStatus;
 
         /// <summary>
-        ///     Specifies project name
-        /// </summary>
-        public readonly string ProjectName;
-
-        /// <summary>
-        ///     Specifies focus database
-        /// </summary>
-        public readonly string DatabaseName;
-
-        /// <summary>
-        ///     Specifies company
-        /// </summary>
-        public readonly string CompanyName;
-
-        /// <summary>
         ///     Specifies current database version
         /// </summary>
         public string CurrentDatabaseVersion { protected set; get; }
+
+        /// <summary>
+        ///     Variable for store map items
+        /// </summary>
+        public G9DtMap ProjectMapData { protected set; get; }
+
+        /// <summary>
+        ///     Category for store total map data
+        /// </summary>
+        private static readonly Dictionary<string, G9DtMap> TotalMapData = new Dictionary<string, G9DtMap>();
 
         #endregion
 
@@ -109,27 +89,30 @@ namespace G9DatabaseVersionControlCore
         /// <summary>
         ///     Constructor - Initialize Requirement
         /// </summary>
-        /// <param name="projectName">
-        ///     Specifies project name (You can use static method GetTotalProjectNames() to get list of
-        ///     projects)
-        /// </param>
-        /// <param name="databaseName">Specifies focus database</param>
-        /// <param name="companyName">Specifies company name (customer)</param>
-        /// <param name="databaseUpdateFilesPath">Specify database update file path</param>
-        /// <param name="defaultSchemaForTables">Specify default schema for create required table</param>
-        /// <param name="productVersion">Specifies product version (Assembly version)</param>
-        /// <param name="databaseUpdateFileEncoding">Specifies encoding of update file - default is UTF8</param>
-        protected G9CDatabaseVersionControl(string projectName, string databaseName, string companyName,
-            string databaseUpdateFilesPath = null, string defaultSchemaForTables = null,
-            string productVersion = null, Encoding databaseUpdateFileEncoding = null)
+        /// <param name="projectName">Specifies project ns assigned map.</param>
+        /// <exception cref="ArgumentException">
+        ///     If not exist a map for this project name. The method throw exception about the map
+        ///     not found.
+        /// </exception>
+        protected G9CDatabaseVersionControl(string projectName)
         {
-            DatabaseUpdateFilesFullPath = databaseUpdateFilesPath ?? DefaultDatabaseUpdateFilesFullPath;
-            SchemaForTables = defaultSchemaForTables ?? DefaultSchemaForTables;
-            DatabaseUpdateFileEncoding = databaseUpdateFileEncoding ?? Encoding.UTF8;
-            ProductVersion = productVersion ?? DefaultProductVersion;
-            ProjectName = projectName ?? throw new ArgumentNullException(nameof(projectName));
-            DatabaseName = databaseName ?? throw new ArgumentNullException(nameof(databaseName));
-            CompanyName = companyName ?? "G9TM";
+            if (!TotalMapData.ContainsKey(projectName))
+                throw new ArgumentException(
+                    $"Map with this project name not found. please use static method '{nameof(MapProjects)}' or use the constructor with map param.");
+            ProjectMapData = TotalMapData[projectName];
+            ProductVersion = ProjectMapData.ProductVersionFunc();
+            CacheTotalData();
+        }
+
+        /// <summary>
+        ///     Constructor - Initialize Requirement
+        /// </summary>
+        /// <param name="map">Specifies a map for assign to project.</param>
+        protected G9CDatabaseVersionControl(G9DtMap map)
+        {
+            ProjectMapData = map;
+            ProductVersion = ProjectMapData.ProductVersionFunc();
+            MapProjects(ProjectMapData);
             CacheTotalData();
         }
 
@@ -141,7 +124,7 @@ namespace G9DatabaseVersionControlCore
             try
             {
                 _totalProjects = new Dictionary<string, G9DtProjectInfo>();
-                var projectsPath = GetFolderNamesFromPath(DatabaseUpdateFilesFullPath)
+                var projectsPath = GetFolderNamesFromPath(ProjectMapData.DatabaseUpdateFilesFullPath)
                     .Select(GetFullPathFromPath).ToArray();
                 foreach (var projectPath in projectsPath)
                 {
@@ -155,7 +138,8 @@ namespace G9DatabaseVersionControlCore
 
                         foreach (var projectUpdateFileName in projectUpdateFileNames)
                         {
-                            var fileData = File.ReadAllText(projectUpdateFileName, DatabaseUpdateFileEncoding);
+                            var fileData = File.ReadAllText(projectUpdateFileName,
+                                ProjectMapData.DatabaseUpdateScriptFileEncoding);
                             var author = GetDataBetweenTwoXmlTag(fileData, "Author");
                             var description = GetDataBetweenTwoXmlTag(fileData, "Description");
                             var version = GetDataBetweenTwoXmlTag(fileData, "Version");
@@ -235,8 +219,9 @@ namespace G9DatabaseVersionControlCore
             try
             {
                 // Check exist project name
-                if (!_totalProjects.ContainsKey(ProjectName))
-                    throw new Exception($"Project with this name is not exist!\nProject name is '{ProjectName}'.");
+                if (!_totalProjects.ContainsKey(ProjectMapData.ProjectName))
+                    throw new Exception(
+                        $"Project with this name is not exist!\nProject name is '{ProjectMapData.ProjectName}'.");
                 int versionInt;
                 // convert version name
                 try
@@ -250,7 +235,7 @@ namespace G9DatabaseVersionControlCore
                         nameof(CurrentDatabaseVersion), e);
                 }
 
-                return _totalProjects[ProjectName].UpdateFoldersInfo
+                return _totalProjects[ProjectMapData.ProjectName].UpdateFoldersInfo
                     .Where(s => int.Parse(s.FolderVersion.Replace(".", string.Empty)) > versionInt)
                     .SelectMany(s => s.UpdateFilesInfos).ToArray();
             }
@@ -270,8 +255,9 @@ namespace G9DatabaseVersionControlCore
             try
             {
                 // Check exist project name
-                if (!_totalProjects.ContainsKey(ProjectName))
-                    throw new Exception($"Project whit this name not exist!\nProject name is '{ProjectName}'.");
+                if (!_totalProjects.ContainsKey(ProjectMapData.ProjectName))
+                    throw new Exception(
+                        $"Project whit this name not exist!\nProject name is '{ProjectMapData.ProjectName}'.");
                 int versionInt;
                 // convert version name
                 try
@@ -285,7 +271,7 @@ namespace G9DatabaseVersionControlCore
                         nameof(CurrentDatabaseVersion), e);
                 }
 
-                return _totalProjects[ProjectName].UpdateFoldersInfo
+                return _totalProjects[ProjectMapData.ProjectName].UpdateFoldersInfo
                     .Where(s => int.Parse(s.FolderVersion.Replace(".", string.Empty)) > versionInt).ToArray();
             }
             catch (Exception e)
@@ -304,8 +290,9 @@ namespace G9DatabaseVersionControlCore
             try
             {
                 // Check exist project name
-                if (!_totalProjects.ContainsKey(ProjectName))
-                    throw new Exception($"Project whit this name not exist!\nProject name is '{ProjectName}'.");
+                if (!_totalProjects.ContainsKey(ProjectMapData.ProjectName))
+                    throw new Exception(
+                        $"Project whit this name not exist!\nProject name is '{ProjectMapData.ProjectName}'.");
                 int versionInt;
                 // convert version name
                 try
@@ -319,7 +306,7 @@ namespace G9DatabaseVersionControlCore
                         nameof(CurrentDatabaseVersion), e);
                 }
 
-                return _totalProjects[ProjectName].UpdateFoldersInfo
+                return _totalProjects[ProjectMapData.ProjectName].UpdateFoldersInfo
                     .Where(s => int.Parse(s.FolderVersion.Replace(".", string.Empty)) > versionInt)
                     .SelectMany(s => s.UpdateFilesInfos).Count();
             }
@@ -564,7 +551,7 @@ namespace G9DatabaseVersionControlCore
         protected abstract void CreateRequirementTables();
 
         /// <summary>
-        /// Method to remove tables of database version control system from database
+        ///     Method to remove tables of database version control system from database
         /// </summary>
         /// <returns>If successful return true</returns>
         public abstract bool RemoveTablesOfDatabaseVersionControlFromDatabase();
@@ -572,12 +559,17 @@ namespace G9DatabaseVersionControlCore
         /// <summary>
         ///     Method for handle and execute new update script on a database
         /// </summary>
-        public abstract void StartUpdate();
+        /// <param name="customDatabaseName">Specifies custom database name for restore</param>
+        /// <returns>If successful the method will return 'true' </returns>
+        public abstract Task<bool> StartUpdate(string customDatabaseName = null);
 
         /// <summary>
         ///     Method for restore a empty database and execute all update script on a database
         /// </summary>
-        public abstract void StartInstall();
+        /// <param name="customDatabaseName">Specifies custom database name for restore</param>
+        /// <param name="databaseRestorePath">Specifies custom restore database file path</param>
+        /// <returns>If successful the method will return 'true' </returns>
+        public abstract Task<bool> StartInstall(string customDatabaseName = null, string databaseRestorePath = null);
 
         /// <summary>
         ///     Method for get backup from a database
@@ -598,6 +590,48 @@ namespace G9DatabaseVersionControlCore
         /// <param name="query">Specifies query</param>
         /// <returns>Received data from query - List specifies rows and dictionary specifies column and value</returns>
         public abstract List<Dictionary<string, object>> ExecuteQueryWithResult(string query);
+
+        /// <summary>
+        ///     Method to add or update map items in category
+        ///     <para />
+        ///     If was exists a map with same project name, the map will be updated. otherwise, will be adding a map like a new map
+        ///     item.
+        /// </summary>
+        /// <exception cref="ArgumentNullException">The method throwing an exception if the param is null or empty.</exception>
+        /// <exception cref="ArgumentNullException">The method throwing an exception if param items are set to the default value.</exception>
+        /// <param name="mapData">Specifies map item</param>
+        public static void MapProjects(params G9DtMap[] mapData)
+        {
+            if ((mapData?.Length ?? 0) == 0)
+                throw new ArgumentNullException(nameof(mapData), $"Param '{nameof(mapData)}' can't be null or empty.");
+
+            if (mapData.Any(s => s.Equals(default(G9DtMap))))
+                throw new ArgumentNullException(nameof(mapData), $"Param '{nameof(mapData)}' can't be set default.");
+
+            foreach (var map in mapData)
+                if (TotalMapData.ContainsKey(map.ProjectName))
+                    TotalMapData[map.ProjectName] = map;
+                else
+                    TotalMapData.Add(map.ProjectName, map);
+        }
+
+        /// <summary>
+        ///     The method will be removing map items by project name from the map category.
+        /// </summary>
+        /// <exception cref="ArgumentNullException">The method throwing exception if project name not exist in map category</exception>
+        public static void UnmapProjects(params string[] projectNames)
+        {
+            var checkExistsValidationProjectName =
+                projectNames.FirstOrDefault(s => TotalMapData.All(x => x.Key != s));
+            if (!Equals(checkExistsValidationProjectName, null))
+                throw new ArgumentException(
+                    $"The map was not found with this project name. Project name: '{checkExistsValidationProjectName}'",
+                    nameof(projectNames));
+
+            foreach (var projectName in projectNames)
+                if (TotalMapData.ContainsKey(projectName))
+                    TotalMapData.Remove(projectName);
+        }
 
         #endregion
     }

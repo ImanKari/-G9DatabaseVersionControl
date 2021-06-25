@@ -5,9 +5,10 @@ using System.Data.SqlClient;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
+using System.Threading.Tasks;
 using G9DatabaseVersionControlCore.Class.SmallLogger;
 using G9DatabaseVersionControlCore.DataType;
+using G9DatabaseVersionControlCore.Enums;
 
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedMemberInSuper.Global
@@ -64,22 +65,14 @@ namespace G9DatabaseVersionControlCore.SqlServer
         /// <param name="connectionStringDataSource">Specifies connection string data source</param>
         /// <param name="connectionStringUserId">Specifies connection string user id</param>
         /// <param name="connectionStringPassword">Specifies connection string password</param>
-        /// <param name="projectName">
-        ///     Specifies project name (You can use static method GetTotalProjectNames() to get list of
-        ///     projects)
-        /// </param>
-        /// <param name="databaseName">Specifies focus database</param>
-        /// <param name="companyName">Specifies company name (customer)</param>
-        /// <param name="databaseUpdateFilesPath">Specify database update file path</param>
-        /// <param name="defaultSchemaForTables">Specify default schema for create required table</param>
-        /// <param name="productVersion">Specifies product version (Assembly version)</param>
-        /// <param name="databaseUpdateFileEncoding">Specifies encoding of update file - default is UTF8</param>
+        /// <param name="projectName">Specifies project name to access assigned map.</param>
+        /// <exception cref="ArgumentException">
+        ///     If not exist a map for this project name. The method throw exception about the map
+        ///     not found.
+        /// </exception>
         public G9CDatabaseVersionControlCoreSQLServer(string connectionStringDataSource, string connectionStringUserId,
-            string connectionStringPassword, string projectName, string databaseName, string companyName,
-            string databaseUpdateFilesPath = null, string defaultSchemaForTables = null, string productVersion = null,
-            Encoding databaseUpdateFileEncoding = null)
-            : base(projectName, databaseName, companyName, databaseUpdateFilesPath, defaultSchemaForTables,
-                productVersion, databaseUpdateFileEncoding)
+            string connectionStringPassword, string projectName)
+            : base(projectName)
         {
             ConnectionStringDataSource = connectionStringDataSource ??
                                          throw new ArgumentNullException(nameof(connectionStringDataSource));
@@ -88,10 +81,34 @@ namespace G9DatabaseVersionControlCore.SqlServer
             ConnectionStringPassword = connectionStringPassword ??
                                        throw new ArgumentNullException(nameof(connectionStringPassword));
             if (!CheckConnectionString(ConnectionStringDataSource, ConnectionStringUserId, ConnectionStringPassword,
-                databaseName))
+                ProjectMapData.DatabaseName))
                 throw new Exception(
-                    $"The entered connection string parameters ({nameof(connectionStringDataSource)}, {nameof(connectionStringUserId)}, {nameof(connectionStringPassword)}) are incorrect!\nConnection string: '{ConvertFieldToConnectionString(connectionStringDataSource, databaseName, connectionStringUserId, connectionStringPassword)}'");
-            CreateRequirementTables();
+                    $"The entered connection string parameters ({nameof(connectionStringDataSource)}, {nameof(connectionStringUserId)}, {nameof(connectionStringPassword)}) are incorrect!\nConnection string: '{ConvertFieldToConnectionString(connectionStringDataSource, ProjectMapData.DatabaseName, connectionStringUserId, connectionStringPassword)}'");
+            CurrentDatabaseVersion = GetDatabaseVersion();
+        }
+
+        /// <summary>
+        ///     Constructor - Initialize requirement
+        /// </summary>
+        /// <param name="connectionStringDataSource">Specifies connection string data source</param>
+        /// <param name="connectionStringUserId">Specifies connection string user id</param>
+        /// <param name="connectionStringPassword">Specifies connection string password</param>
+        /// <param name="map">Specifies a map for assign to project.</param>
+        public G9CDatabaseVersionControlCoreSQLServer(string connectionStringDataSource, string connectionStringUserId,
+            string connectionStringPassword, G9DtMap map)
+            : base(map)
+        {
+            ConnectionStringDataSource = connectionStringDataSource ??
+                                         throw new ArgumentNullException(nameof(connectionStringDataSource));
+            ConnectionStringUserId =
+                connectionStringUserId ?? throw new ArgumentNullException(nameof(connectionStringUserId));
+            ConnectionStringPassword = connectionStringPassword ??
+                                       throw new ArgumentNullException(nameof(connectionStringPassword));
+
+            if (!CheckConnectionString(ConnectionStringDataSource, ConnectionStringUserId, ConnectionStringPassword,
+                ProjectMapData.DatabaseName))
+                throw new Exception(
+                    $"The entered connection string parameters ({nameof(connectionStringDataSource)}, {nameof(connectionStringUserId)}, {nameof(connectionStringPassword)}) are incorrect!\nConnection string: '{ConvertFieldToConnectionString(connectionStringDataSource, ProjectMapData.DatabaseName, connectionStringUserId, connectionStringPassword)}'");
             CurrentDatabaseVersion = GetDatabaseVersion();
         }
 
@@ -198,7 +215,8 @@ namespace G9DatabaseVersionControlCore.SqlServer
                     new SqlConnection(ConvertFieldToConnectionString(ConnectionStringDataSource,
                         ConnectionStringUserId, ConnectionStringPassword)))
                 {
-                    using (var command = new SqlCommand("SELECT db_id('" + DatabaseName + "')", connection))
+                    using (var command =
+                        new SqlCommand("SELECT db_id('" + ProjectMapData.DatabaseName + "')", connection))
                     {
                         connection.Open();
                         if (command.ExecuteScalar() == DBNull.Value)
@@ -220,7 +238,8 @@ namespace G9DatabaseVersionControlCore.SqlServer
             try
             {
                 var result =
-                    ExecuteQueryWithResult($"SELECT DatabaseVersion FROM [{SchemaForTables}].[G9DatabaseVersion]");
+                    ExecuteQueryWithResult(
+                        $"SELECT DatabaseVersion FROM [{ProjectMapData.DefaultSchemaForTables}].[G9DatabaseVersion]");
                 return result.Any() && result[0].Any() ? result[0]["DatabaseVersion"].ToString() : "0.0.0.0";
             }
             catch (Exception ex)
@@ -237,18 +256,17 @@ namespace G9DatabaseVersionControlCore.SqlServer
 (
     SELECT *
     FROM INFORMATION_SCHEMA.TABLES
-    WHERE TABLE_SCHEMA = '{SchemaForTables}'
+    WHERE TABLE_SCHEMA = '{ProjectMapData.DefaultSchemaForTables}'
           AND TABLE_NAME = 'G9DatabaseVersion'
 )
    )
 BEGIN
-    CREATE TABLE [{SchemaForTables}].[G9DatabaseVersion]
+    CREATE TABLE [{ProjectMapData.DefaultSchemaForTables}].[G9DatabaseVersion]
     (
         [DatabaseVersion] [NVARCHAR](50) NOT NULL,
         [ProductVersion] [NVARCHAR](50) NOT NULL,
         [DatabaseVersionDateTime] [DATETIME2](7) NOT NULL,
-        [LastUpdateDateTime] [DATETIME2](7) NOT NULL,
-        [CompanyName] [NVARCHAR](50) NOT NULL
+        [LastUpdateDateTime] [DATETIME2](7) NOT NULL
     ) ON [PRIMARY];
 END;
 
@@ -256,12 +274,12 @@ IF (NOT EXISTS
 (
     SELECT *
     FROM INFORMATION_SCHEMA.TABLES
-    WHERE TABLE_SCHEMA = '{SchemaForTables}'
+    WHERE TABLE_SCHEMA = '{ProjectMapData.DefaultSchemaForTables}'
           AND TABLE_NAME = 'G9DatabaseUpdateHistory'
 )
    )
 BEGIN
-    CREATE TABLE [{SchemaForTables}].[G9DatabaseUpdateHistory]
+    CREATE TABLE [{ProjectMapData.DefaultSchemaForTables}].[G9DatabaseUpdateHistory]
     (
         [UpdateFileFullPath] [NVARCHAR](300) NOT NULL,
         [ExecuteDateTime] [DATETIME2](7) NOT NULL,
@@ -273,18 +291,17 @@ BEGIN
     ) ON [PRIMARY];
 END;
 
-IF ((SELECT COUNT(*) FROM [{SchemaForTables}].[G9DatabaseVersion]) = 0)
+IF ((SELECT COUNT(*) FROM [{ProjectMapData.DefaultSchemaForTables}].[G9DatabaseVersion]) = 0)
 BEGIN
-    INSERT INTO [{SchemaForTables}].[G9DatabaseVersion]
+    INSERT INTO [{ProjectMapData.DefaultSchemaForTables}].[G9DatabaseVersion]
     (
         [DatabaseVersion],
         [ProductVersion],
         [DatabaseVersionDateTime],
-        [LastUpdateDateTime],
-        [CompanyName]
+        [LastUpdateDateTime]
     )
     VALUES
-    (N'0.0.0.0', N'{ProductVersion}', '1990-09-01 00:00:00', '1990-09-01 00:00:00', N'{CompanyName}');
+    (N'0.0.0.0', N'{ProjectMapData.DefaultSchemaForTables}', '1990-09-01 00:00:00', '1990-09-01 00:00:00');
 END;");
         }
 
@@ -297,18 +314,18 @@ END;");
 (
     SELECT 1
     FROM INFORMATION_SCHEMA.TABLES
-    WHERE TABLE_SCHEMA = '{SchemaForTables}'
+    WHERE TABLE_SCHEMA = '{ProjectMapData.DefaultSchemaForTables}'
           AND TABLE_NAME = 'G9DatabaseVersion'
 )
-    DROP TABLE [{SchemaForTables}].[G9DatabaseVersion];
+    DROP TABLE [{ProjectMapData.DefaultSchemaForTables}].[G9DatabaseVersion];
 IF EXISTS
 (
     SELECT 1
     FROM INFORMATION_SCHEMA.TABLES
-    WHERE TABLE_SCHEMA = '{SchemaForTables}'
+    WHERE TABLE_SCHEMA = '{ProjectMapData.DefaultSchemaForTables}'
           AND TABLE_NAME = 'G9DatabaseUpdateHistory'
 )
-    DROP TABLE [{SchemaForTables}].[G9DatabaseUpdateHistory];");
+    DROP TABLE [{ProjectMapData.DefaultSchemaForTables}].[G9DatabaseUpdateHistory];");
                 return true;
             }
             catch (Exception ex)
@@ -319,17 +336,83 @@ IF EXISTS
         }
 
         /// <inheritdoc />
-        public override void StartUpdate()
+        public override async Task<bool> StartUpdate(string customDatabaseName = null)
         {
-            if (CheckUpdateExist())
-                ExecutesScriptsOnDatabase(GetUpdateFolders(), GetCountOfUpdateFiles());
+            return await Task.Run(() =>
+            {
+                // Step 1: Rename the database as needed
+                if (ProjectMapData.EnableSetCustomDatabaseName && !string.IsNullOrEmpty(customDatabaseName))
+                    ProjectMapData.ChangeDatabaseName(customDatabaseName);
+
+                // Step 2: Create Requirements tables if not exists
+                CreateRequirementTables();
+
+                // Step 3: If there was an update for the current version  => Execute update scripts on the database
+                if (CheckUpdateExist())
+                    ExecutesScriptsOnDatabase(GetUpdateFolders(), GetCountOfUpdateFiles());
+
+                // Last step: return true
+                return true;
+            });
         }
 
         /// <inheritdoc />
-        public override void StartInstall()
+        public override async Task<bool> StartInstall(string customDatabaseName = null,
+            string databaseRestorePath = null)
         {
-            var success = RestoreDatabase(string.Empty, string.Empty, string.Empty);
-            throw new NotImplementedException();
+            return await Task.Run(async () =>
+            {
+                // Step 1: Restore 
+                switch (ProjectMapData.BaseDatabaseType)
+                {
+                    case G9EBaseDatabaseType.NotSet:
+                        throw new Exception(
+                            "Can't find the base database setting for this project name. please check the assigned map.");
+                    case G9EBaseDatabaseType.CreateBaseDatabaseByBackupDatabasePath:
+                        var success = RestoreDatabase(ProjectMapData.BaseDatabaseBackupPath,
+                            ProjectMapData.EnableSetCustomDatabaseName && !string.IsNullOrEmpty(customDatabaseName)
+                                ? customDatabaseName
+                                : ProjectMapData.DatabaseName
+                            , ProjectMapData.EnableSetCustomDatabaseRestoreFilePath &&
+                              !string.IsNullOrEmpty(databaseRestorePath)
+                                ? databaseRestorePath
+                                : null);
+                        break;
+                    case G9EBaseDatabaseType.CreateBaseDatabaseByScriptData:
+                        ExecuteQueryWithResult(ProjectMapData.GenerateBaseDatabaseScriptFunc(
+                            ProjectMapData.EnableSetCustomDatabaseName && !string.IsNullOrEmpty(customDatabaseName)
+                                ? customDatabaseName
+                                : null
+                            , ProjectMapData.EnableSetCustomDatabaseRestoreFilePath &&
+                              !string.IsNullOrEmpty(databaseRestorePath)
+                                ? databaseRestorePath
+                                : null));
+                        break;
+                    case G9EBaseDatabaseType.CreateBaseDatabaseByFunc:
+                        ProjectMapData.CreateDatabaseFunc(
+                            ProjectMapData.EnableSetCustomDatabaseName && !string.IsNullOrEmpty(customDatabaseName)
+                                ? customDatabaseName
+                                : null
+                            , ProjectMapData.EnableSetCustomDatabaseRestoreFilePath &&
+                              !string.IsNullOrEmpty(databaseRestorePath)
+                                ? databaseRestorePath
+                                : null);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(G9EBaseDatabaseType),
+                            $"There is no implementation for type '{ProjectMapData.BaseDatabaseType}'!");
+                }
+
+                // Step 2: Rename the database as needed
+                if (ProjectMapData.EnableSetCustomDatabaseName && !string.IsNullOrEmpty(customDatabaseName))
+                    ProjectMapData.ChangeDatabaseName(customDatabaseName);
+
+                // Step 3: Create Requirements tables
+                CreateRequirementTables();
+
+                // Step 4: Execute update scripts on base database
+                return await StartUpdate();
+            });
         }
 
         /// <inheritdoc />
@@ -340,16 +423,17 @@ IF EXISTS
                 if (CheckDatabaseExist())
                     using (var sqlCon = new SqlConnection(ConnectionString))
                     {
-                        var backupUrl = Path.Combine(backupPath, $"{DatabaseName}-{DateTime.Now:yyyy-MM-dd-HH-mm}.bak");
+                        var backupUrl = Path.Combine(backupPath,
+                            $"{ProjectMapData.DatabaseName}-{DateTime.Now:yyyy-MM-dd-HH-mm}.bak");
                         if (File.Exists(backupUrl))
                             File.Delete(Path.Combine(backupPath,
-                                $"{DatabaseName}-{DateTime.Now:yyyy-MM-dd-HH-mm}.bak"));
+                                $"{ProjectMapData.DatabaseName}-{DateTime.Now:yyyy-MM-dd-HH-mm}.bak"));
 
                         sqlCon.Open();
 
 
                         using (var sqlCmd = new SqlCommand(
-                            "backup database " + DatabaseName + " to disk='" + backupUrl + "'", sqlCon))
+                            "backup database " + ProjectMapData.DatabaseName + " to disk='" + backupUrl + "'", sqlCon))
                         {
                             return sqlCmd.ExecuteNonQuery() != 0;
                         }
@@ -379,7 +463,7 @@ IF EXISTS
                 foreach (var folder in updateFolders)
                 {
                     var queryDatabaseVersionUpdate =
-                        $"UPDATE [{SchemaForTables}].[G9DatabaseVersion] SET DatabaseVersion = '{folder.FolderVersion}', ProductVersion = '{ProductVersion}', DatabaseVersionDateTime = '{folder.FolderDateTime.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture)}', LastUpdateDateTime = GETDATE()";
+                        $"UPDATE [{ProjectMapData.DefaultSchemaForTables}].[G9DatabaseVersion] SET DatabaseVersion = '{folder.FolderVersion}', ProductVersion = '{ProductVersion}', DatabaseVersionDateTime = '{folder.FolderDateTime.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture)}', LastUpdateDateTime = GETDATE()";
                     try
                     {
                         ExecuteQueryWithoutResult(queryDatabaseVersionUpdate);
@@ -397,7 +481,8 @@ IF EXISTS
                         {
                             ExecuteQueryWithoutResult(file.UpdateFileData);
 
-                            var queryUpdateHistory = $@"INSERT INTO [{SchemaForTables}].[G9DatabaseUpdateHistory]
+                            var queryUpdateHistory =
+                                $@"INSERT INTO [{ProjectMapData.DefaultSchemaForTables}].[G9DatabaseUpdateHistory]
 ([UpdateFileFullPath], [ExecuteDateTime], [Author], [Description], [UpdateDateTime], [Version], [IsSuccess])
 VALUES
 ('{FixedLengthFromEndOfString(file.UpdateFileFullPath, 300)}', GETDATE(), '{FixedLengthFromEndOfString(file.Author, 30)}',
@@ -422,7 +507,8 @@ VALUES
                             PlusCountOfTaskError();
                             // Ignore
 
-                            var queryUpdateHistory = $@"INSERT INTO [{SchemaForTables}].[G9DatabaseUpdateHistory]
+                            var queryUpdateHistory =
+                                $@"INSERT INTO [{ProjectMapData.DefaultSchemaForTables}].[G9DatabaseUpdateHistory]
 ([UpdateFileFullPath], [ExecuteDateTime], [Author], [Description], [UpdateDateTime], [Version], [IsSuccess])
 VALUES
 ('{FixedLengthFromEndOfString(file.UpdateFileFullPath, 300)}', GETDATE(), '{FixedLengthFromEndOfString(file.Author, 30)}',
@@ -455,7 +541,7 @@ VALUES
             using (var connection = new SqlConnection(ConnectionString))
             {
                 connection.Open();
-                connection.ChangeDatabase(DatabaseName);
+                connection.ChangeDatabase(ProjectMapData.DatabaseName);
                 using (var command =
                     new SqlCommand(
                         query,
@@ -474,7 +560,7 @@ VALUES
             using (var connection = new SqlConnection(ConnectionString))
             {
                 connection.Open();
-                connection.ChangeDatabase(DatabaseName);
+                connection.ChangeDatabase(ProjectMapData.DatabaseName);
                 using (var command =
                     new SqlCommand(
                         query,
@@ -552,7 +638,7 @@ VALUES
                         databaseName,
                         databaseFullPath,
                         pathForDatabase,
-                        DatabaseName
+                        ProjectMapData.DatabaseName
                     );
                     sqlCon.Open();
 

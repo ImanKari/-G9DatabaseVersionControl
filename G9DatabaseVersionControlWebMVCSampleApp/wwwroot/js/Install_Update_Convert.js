@@ -1063,7 +1063,7 @@ $(document).ready(function() {
                             result.ShowAcceptAndDeniedBTN,
                             !result.Success,
                             StopLoading(function() {
-                                $(".MainDiv_CenterDiv_SetDataForInstall").fadeIn(369);
+                                // Ignore
                             }));
                     }
                     funcSuccessReceive(result);

@@ -38,4 +38,14 @@
     <ProjectReference Include="..\G9DatabaseVersionControlCore.SqlServer\G9DatabaseVersionControlCore.SqlServer.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="BaseDatabaseBackup\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="BaseDatabaseBackup\Test.BAK">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

@@ -94,6 +94,7 @@ body {
 
 .MainDiv_CenterDiv_MessageDiv {
     background-color: #222222;
+    background-color: rgba(34, 34, 34, 0.69);
     height: 100%;
     left: 0;
     position: absolute;
