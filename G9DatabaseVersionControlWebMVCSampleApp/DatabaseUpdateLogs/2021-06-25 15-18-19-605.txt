@@ -1,0 +1,4 @@
+############################## Exception ##############################
+[2021-06-25 15:18:19]: Exception Message: Login failed for user 'saa'.
+File Name: G:\Project\G9DatabaseVersionControl\G9DatabaseVersionControlCore.SqlServer\G9CDatabaseVersionControlCoreSQLServer.cs	Method Base: CheckConnectionString	Line Number: 145
+

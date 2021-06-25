@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -44,13 +45,16 @@ namespace G9DatabaseVersionControlCore.DataType
         ///     Specifies a func for create new database
         ///     <param />
         ///     <param />
-        ///     First param:
+        ///     First param: string => Specifies database name (pass automatically on execute func)
         ///     <para />
         ///     Second param: string => Specifies database custom path for restore files (if not set it's null).
         ///     <para />
-        ///     Third param: G9DtTaskResult => Specifies task (create new database) is successful or no (method answer)
+        ///     Third param: object => It can include string connection, connection object, and so on. (For example, for the SQL
+        ///     server type, the string connection is passed.)
+        ///     <para />
+        ///     Fourth param: G9DtTaskResult => Specifies task (create new database) is successful or no (func answer)
         /// </summary>
-        public readonly Func<string, string, G9DtTaskResult> CreateDatabaseFunc;
+        public readonly Func<string, string, object, G9DtTaskResult> CreateDatabaseFunc;
 
         /// <summary>
         ///     specifies base database type for initialize and create
@@ -92,6 +96,27 @@ namespace G9DatabaseVersionControlCore.DataType
         /// </summary>
         public readonly Func<string> ProductVersionFunc;
 
+        /// <summary>
+        ///     Func for convert and transfer old data from an old database to a new one
+        ///     <para />
+        ///     <para />
+        ///     This function must manage the conversion and transfer operations
+        ///     <param />
+        ///     First param: string => Specifies old database name (Can't be null)
+        ///     <para />
+        ///     Second param: string => Specifies new database name (Can't be null)
+        ///     <para />
+        ///     Third param: Action(string) => Access to action for execute a query on database without result
+        ///     <para />
+        ///     Fourth param: Fun(Dictionary(string, object)) => Access to func for execute a query on database with result (List
+        ///     specifies rows and dictionary specifies column and value)
+        ///     <para />
+        ///     Fifth param: Specifies task is successful or no (func answer)
+        /// </summary>
+        public readonly
+            Func<string, string, Action<string>, Func<string, List<Dictionary<string, object>>>, G9DtTaskResult>
+            ConvertFromOldDbToNewDbFunc;
+
         #endregion
 
         #region ### Methods ###
@@ -106,10 +131,29 @@ namespace G9DatabaseVersionControlCore.DataType
         /// <param name="defaultSchemaForTables">Specifies default schema for create required table (default is 'dbo')</param>
         /// <param name="databaseUpdateScriptFileEncoding">Specifies encoding of update script file (default is 'UTF8')</param>
         /// <param name="productVersionFunc">Func for specifies product version (default use Assembly version)</param>
+        /// <param name="convertFromOldDbToNewDbFunc">
+        ///     Func for convert and transfer old data from an old database to a new one
+        ///     <para />
+        ///     <para />
+        ///     This function must manage the conversion and transfer operations
+        ///     <param />
+        ///     First param: string => Specifies old database name (Can't be null)
+        ///     <para />
+        ///     Second param: string => Specifies new database name (Can't be null)
+        ///     <para />
+        ///     Third param: Action(string) => Access to action for execute a query on database without result
+        ///     <para />
+        ///     Fourth param: Fun(Dictionary(string, object)) => Access to func for execute a query on database with result (List
+        ///     specifies rows and dictionary specifies column and value)
+        ///     <para />
+        ///     Fifth param: Specifies task is successful or no (func answer)
+        /// </param>
         public G9DtMap(string projectName, string databaseName,
             G9DtMapDatabaseScriptRequirements databaseScriptRequirements, string databaseUpdateFilesFullPath = null,
             string defaultSchemaForTables = null, Encoding databaseUpdateScriptFileEncoding = null,
-            Func<string> productVersionFunc = null)
+            Func<string> productVersionFunc = null,
+            Func<string, string, Action<string>, Func<string, List<Dictionary<string, object>>>, G9DtTaskResult>
+                convertFromOldDbToNewDbFunc = null)
         {
             DatabaseUpdateFilesFullPath = string.IsNullOrEmpty(databaseUpdateFilesFullPath)
                 ? G9CDatabaseVersionControl.DefaultDatabaseUpdateFilesFullPath
@@ -123,6 +167,7 @@ namespace G9DatabaseVersionControlCore.DataType
             ProjectName = projectName;
             DatabaseName = databaseName;
             DatabaseScriptRequirements = databaseScriptRequirements;
+            ConvertFromOldDbToNewDbFunc = convertFromOldDbToNewDbFunc;
             ProductVersionFunc = productVersionFunc ?? (() => G9CDatabaseVersionControl.DefaultProductVersion);
             DatabaseUpdateScriptFileEncoding = databaseUpdateScriptFileEncoding ?? Encoding.UTF8;
             DefaultSchemaForTables = string.IsNullOrEmpty(defaultSchemaForTables)
@@ -157,11 +202,30 @@ namespace G9DatabaseVersionControlCore.DataType
         /// <param name="defaultSchemaForTables">Specifies default schema for create required table (default is 'dbo')</param>
         /// <param name="databaseUpdateScriptFileEncoding">Specifies encoding of update script file (default is 'UTF8')</param>
         /// <param name="productVersionFunc">Func for specifies product version (default use Assembly version)</param>
+        /// <param name="convertFromOldDbToNewDbFunc">
+        ///     Func for convert and transfer old data from an old database to a new one
+        ///     <para />
+        ///     <para />
+        ///     This function must manage the conversion and transfer operations
+        ///     <param />
+        ///     First param: string => Specifies old database name (Can't be null)
+        ///     <para />
+        ///     Second param: string => Specifies new database name (Can't be null)
+        ///     <para />
+        ///     Third param: Action(string) => Access to action for execute a query on database without result
+        ///     <para />
+        ///     Fourth param: Fun(Dictionary(string, object)) => Access to func for execute a query on database with result (List
+        ///     specifies rows and dictionary specifies column and value)
+        ///     <para />
+        ///     Fifth param: Specifies task is successful or no (func answer)
+        /// </param>
         public G9DtMap(string projectName, string databaseName, string baseDatabasePath,
             G9DtMapDatabaseScriptRequirements databaseScriptRequirements, string databaseUpdateFilesFullPath = null,
             bool enableCustomDatabaseName = true, bool enableSetCustomDatabaseRestoreFilePath = true,
             string defaultSchemaForTables = null,
-            Encoding databaseUpdateScriptFileEncoding = null, Func<string> productVersionFunc = null)
+            Encoding databaseUpdateScriptFileEncoding = null, Func<string> productVersionFunc = null,
+            Func<string, string, Action<string>, Func<string, List<Dictionary<string, object>>>, G9DtTaskResult>
+                convertFromOldDbToNewDbFunc = null)
         {
             DatabaseUpdateFilesFullPath = string.IsNullOrEmpty(databaseUpdateFilesFullPath)
                 ? G9CDatabaseVersionControl.DefaultDatabaseUpdateFilesFullPath
@@ -184,6 +248,7 @@ namespace G9DatabaseVersionControlCore.DataType
             DatabaseName = databaseName;
             BaseDatabaseBackupPath = baseDatabasePath;
             DatabaseScriptRequirements = databaseScriptRequirements;
+            ConvertFromOldDbToNewDbFunc = convertFromOldDbToNewDbFunc;
             EnableSetCustomDatabaseRestoreFilePath = enableSetCustomDatabaseRestoreFilePath;
             ProductVersionFunc = productVersionFunc ?? (() => G9CDatabaseVersionControl.DefaultProductVersion);
             DatabaseUpdateScriptFileEncoding = databaseUpdateScriptFileEncoding ?? Encoding.UTF8;
@@ -225,12 +290,31 @@ namespace G9DatabaseVersionControlCore.DataType
         /// <param name="defaultSchemaForTables">Specifies default schema for create required table (default is 'dbo')</param>
         /// <param name="databaseUpdateScriptFileEncoding">Specifies encoding of update script file (default is 'UTF8')</param>
         /// <param name="productVersionFunc">Func for specifies product version (default use Assembly version)</param>
+        /// <param name="convertFromOldDbToNewDbFunc">
+        ///     Func for convert and transfer old data from an old database to a new one
+        ///     <para />
+        ///     <para />
+        ///     This function must manage the conversion and transfer operations
+        ///     <param />
+        ///     First param: string => Specifies old database name (Can't be null)
+        ///     <para />
+        ///     Second param: string => Specifies new database name (Can't be null)
+        ///     <para />
+        ///     Third param: Action(string) => Access to action for execute a query on database without result
+        ///     <para />
+        ///     Fourth param: Fun(Dictionary(string, object)) => Access to func for execute a query on database with result (List
+        ///     specifies rows and dictionary specifies column and value)
+        ///     <para />
+        ///     Fifth param: Specifies task is successful or no (func answer)
+        /// </param>
         public G9DtMap(string projectName, string databaseName,
             Func<string, string, string> generateBaseDatabaseScriptFunc,
             G9DtMapDatabaseScriptRequirements databaseScriptRequirements, string databaseUpdateFilesFullPath = null,
             bool enableCustomDatabaseName = true, bool enableSetCustomDatabaseRestoreFilePath = true,
             string defaultSchemaForTables = null,
-            Encoding databaseUpdateScriptFileEncoding = null, Func<string> productVersionFunc = null)
+            Encoding databaseUpdateScriptFileEncoding = null, Func<string> productVersionFunc = null,
+            Func<string, string, Action<string>, Func<string, List<Dictionary<string, object>>>, G9DtTaskResult>
+                convertFromOldDbToNewDbFunc = null)
         {
             DatabaseUpdateFilesFullPath = string.IsNullOrEmpty(databaseUpdateFilesFullPath)
                 ? G9CDatabaseVersionControl.DefaultDatabaseUpdateFilesFullPath
@@ -248,6 +332,7 @@ namespace G9DatabaseVersionControlCore.DataType
                 nameof(generateBaseDatabaseScriptFunc),
                 $"Param '{nameof(generateBaseDatabaseScriptFunc)}' can't be null!");
             DatabaseScriptRequirements = databaseScriptRequirements;
+            ConvertFromOldDbToNewDbFunc = convertFromOldDbToNewDbFunc;
             EnableSetCustomDatabaseRestoreFilePath = enableSetCustomDatabaseRestoreFilePath;
             ProductVersionFunc = productVersionFunc ?? (() => G9CDatabaseVersionControl.DefaultProductVersion);
             DatabaseUpdateScriptFileEncoding = databaseUpdateScriptFileEncoding ?? Encoding.UTF8;
@@ -271,7 +356,10 @@ namespace G9DatabaseVersionControlCore.DataType
         ///     <para />
         ///     Second param: string => Specifies database custom path for restore files (if not set it's null).
         ///     <para />
-        ///     Third param: G9DtTaskResult => Specifies task (create new database) is successful or no
+        ///     Third param: object => It can include string connection, connection object, and so on. (For example, for the SQL
+        ///     server type, the string connection is passed.)
+        ///     <para />
+        ///     Fourth param: G9DtTaskResult => Specifies task (create new database) is successful or no (func answer)
         /// </param>
         /// <param name="databaseScriptRequirements">Specifies database script Requirements</param>
         /// <param name="databaseUpdateFilesFullPath">
@@ -289,11 +377,31 @@ namespace G9DatabaseVersionControlCore.DataType
         /// <param name="defaultSchemaForTables">Specifies default schema for create required table (default is 'dbo')</param>
         /// <param name="databaseUpdateScriptFileEncoding">Specifies encoding of update script file (default is 'UTF8')</param>
         /// <param name="productVersionFunc">Func for specifies product version (default use Assembly version)</param>
-        public G9DtMap(string projectName, string databaseName, Func<string, string, G9DtTaskResult> createDatabaseFunc,
+        /// <param name="convertFromOldDbToNewDbFunc">
+        ///     Func for convert and transfer old data from an old database to a new one
+        ///     <para />
+        ///     <para />
+        ///     This function must manage the conversion and transfer operations
+        ///     <param />
+        ///     First param: string => Specifies old database name (Can't be null)
+        ///     <para />
+        ///     Second param: string => Specifies new database name (Can't be null)
+        ///     <para />
+        ///     Third param: Action(string) => Access to action for execute a query on database without result
+        ///     <para />
+        ///     Fourth param: Fun(Dictionary(string, object)) => Access to func for execute a query on database with result (List
+        ///     specifies rows and dictionary specifies column and value)
+        ///     <para />
+        ///     Fifth param: Specifies task is successful or no (func answer)
+        /// </param>
+        public G9DtMap(string projectName, string databaseName,
+            Func<string, string, object, G9DtTaskResult> createDatabaseFunc,
             G9DtMapDatabaseScriptRequirements databaseScriptRequirements, string databaseUpdateFilesFullPath = null,
             bool enableCustomDatabaseName = true, bool enableSetCustomDatabaseRestoreFilePath = true,
             string defaultSchemaForTables = null,
-            Encoding databaseUpdateScriptFileEncoding = null, Func<string> productVersionFunc = null)
+            Encoding databaseUpdateScriptFileEncoding = null, Func<string> productVersionFunc = null,
+            Func<string, string, Action<string>, Func<string, List<Dictionary<string, object>>>, G9DtTaskResult>
+                convertFromOldDbToNewDbFunc = null)
         {
             DatabaseUpdateFilesFullPath = string.IsNullOrEmpty(databaseUpdateFilesFullPath)
                 ? G9CDatabaseVersionControl.DefaultDatabaseUpdateFilesFullPath
@@ -311,6 +419,7 @@ namespace G9DatabaseVersionControlCore.DataType
             CreateDatabaseFunc = createDatabaseFunc ?? throw new ArgumentNullException(nameof(createDatabaseFunc),
                 $"Param '{nameof(createDatabaseFunc)}' can't be null!");
             DatabaseScriptRequirements = databaseScriptRequirements;
+            ConvertFromOldDbToNewDbFunc = convertFromOldDbToNewDbFunc;
             EnableSetCustomDatabaseRestoreFilePath = enableSetCustomDatabaseRestoreFilePath;
             ProductVersionFunc = productVersionFunc ?? (() => G9CDatabaseVersionControl.DefaultProductVersion);
             DatabaseUpdateScriptFileEncoding = databaseUpdateScriptFileEncoding ?? Encoding.UTF8;
@@ -341,7 +450,7 @@ namespace G9DatabaseVersionControlCore.DataType
         }
 
         /// <summary>
-        /// Method to change database name
+        ///     Method to change database name
         /// </summary>
         /// <param name="newDatabaseName">Specifies new database name</param>
         public void ChangeDatabaseName(string newDatabaseName)
