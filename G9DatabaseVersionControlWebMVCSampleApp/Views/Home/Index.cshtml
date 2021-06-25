@@ -77,38 +77,63 @@
     <div class="MainDiv_CenterDiv_Cul" itemtype="1">
         <img class="MainDiv_CenterDiv_Row_InstallType" src="Images/Install_Update_Convert/InstallItem/1.png"/>
         <div class="MainDiv_CenterDiv_Row">
-            <label class="MainDiv_CenterDiv_Lable FullWidth">Install software</label>
+            <label class="MainDiv_CenterDiv_Lable FullWidth">Install and update</label>
             <br/>
-            <label class="MainDiv_CenterDiv_LableSmall FullWidth">By choosing this item a new version of the data collection software along with the empty database will be installed. The bank will then be automatically updated to the latest version.</label>
+            <label class="MainDiv_CenterDiv_LableSmall FullWidth">By choosing this item a new version of the software along with the empty database will be installed. The bank will then be automatically updated to the latest version.</label>
         </div>
     </div>
 
     <div class="MainDiv_CenterDiv_Cul" ItemType="3">
         <img class="MainDiv_CenterDiv_Row_InstallType" src="Images/Install_Update_Convert/InstallItem/3.png"/>
         <div class="MainDiv_CenterDiv_Row">
-            <label class="MainDiv_CenterDiv_Lable FullWidth">Web Update</label>
+            <label class="MainDiv_CenterDiv_Lable FullWidth">Update</label>
             <br/>
-            <label class="MainDiv_CenterDiv_LableSmall FullWidth">If you have previously had a copy of Windows Data logger Software and need to update it to the latest version, you should use this version.</label>
+            <label class="MainDiv_CenterDiv_LableSmall FullWidth">If you have previously had an old version of the Software and need to update it to the latest version, you should use this item.</label>
         </div>
     </div>
 
     <div class="MainDiv_CenterDiv_Cul" ItemType="2">
         <img class="MainDiv_CenterDiv_Row_InstallType" src="Images/Install_Update_Convert/InstallItem/2.png"/>
         <div class="MainDiv_CenterDiv_Row">
-            <label class="MainDiv_CenterDiv_Lable FullWidth">Convert from Old to New</label>
+            <label class="MainDiv_CenterDiv_Lable FullWidth">Custom Task</label>
             <br/>
-            <label class="MainDiv_CenterDiv_LableSmall FullWidth">If you have previously had a copy of Windows Digital Logsheet Software and need to update it to the latest version, use this version.</label>
+            <label class="MainDiv_CenterDiv_LableSmall FullWidth">If you want to run the custom task. You must use this item. After selecting this item, you can see the description related to the task.</label>
         </div>
     </div>
 
 </div>
 
-<!-- Step 3: Get database names -->
+
+<!-- Step 3: Choose Project -->
+<div class="MainDiv_CenterDiv_ChooseProject Pages">
+
+    <div id="MainDiv_CenterDiv_ChooseProject_TableDiv">
+        <table>
+            <thead>
+            <tr>
+                <th>Project Name</th>
+                <th>Project Version</th>
+                <th>Database Name</th>
+                <th>Database Version</th>
+            </tr>
+            </thead>
+            <tbody id="ChooseProjectTbody">
+            </tbody>
+        </table>
+    </div>
+
+    <div class="MainDiv_CenterDiv_Row">
+        <button class="MainDiv_CenterDiv_BTN" id="Btn_BackStep2">Back To Previous</button>
+    </div>
+
+</div>
+
+<!-- Step 4: Get database names -->
 <div class="MainDiv_CenterDiv_SetDataForInstall Pages">
 
     <div id="MainDiv_CenterDiv_SetDataForInstall_NewDBDiv">
         <div class="MainDiv_CenterDiv_Row">
-            <label class="MainDiv_CenterDiv_Lable">New database Name</label>
+            <label class="MainDiv_CenterDiv_Lable">Default database name</label>
         </div>
 
         <div class="MainDiv_CenterDiv_Row">
@@ -116,52 +141,30 @@
         </div>
     </div>
 
-    <div id="MainDiv_CenterDiv_SetDataForInstall_OldDBDiv">
-        <div class="MainDiv_CenterDiv_Row">
-            <label class="MainDiv_CenterDiv_Lable">Old database Name</label>
-        </div>
-
-        <div class="MainDiv_CenterDiv_Row">
-            <input id="Input_OldDBName" class="MainDiv_CenterDiv_SetDataForInstall_Input" type="text"/>
-        </div>
-    </div>
-
     <div class="MainDiv_CenterDiv_Row">
         <button class="MainDiv_CenterDiv_BTN" id="Btn_NextStep4">Continue installation</button>
-        <button class="MainDiv_CenterDiv_BTN" id="Btn_BackStep2">Back To Previous</button>
+        <button class="MainDiv_CenterDiv_BTN" id="Btn_BackStep2_1">Back To Previous</button>
     </div>
-
 
 </div>
 
-<!-- Step 4: Get company name -->
+<!-- Step 5: Get company name -->
 <div class="MainDiv_CenterDiv_SetSoftwareName Pages">
-
-    <div style="margin-bottom: 39px; margin-top: 39px;">
-        <div class="MainDiv_CenterDiv_Row">
-            <label class="MainDiv_CenterDiv_Lable">Customer Company Name</label>
-        </div>
-
-        <div class="MainDiv_CenterDiv_Row">
-            <input id="Input_CompanyName" class="MainDiv_CenterDiv_SetDataForInstall_Input" type="text"/>
-        </div>
-    </div>
-
-
+    
     <div class="MainDiv_CenterDiv_Row">
 
         <div id="Input_SetDbURL_Message">Database path specification is not mandatory. In case not specified, the database will be built into the default database location.</div>
 
         <button class="MainDiv_CenterDiv_BTN" id="Input_SetDbURL">Specify Database Path</button>
         <input placeholder="C:/FolderName" class="hidden" id="Input_SetDbURL_Text" type="text"/>
-        <br/>
+        <br /><br /><br />
         <button class="MainDiv_CenterDiv_BTN" id="Btn_StartInstall">Start Installation</button>
         <button class="MainDiv_CenterDiv_BTN" id="Btn_BackStep3">Back To Previous</button>
     </div>
 
 </div>
 
-<!-- Step 5: Initialize and start  -->
+<!-- Step 6: Initialize and start  -->
 <div class="MainDiv_CenterDiv_StartInstall Pages">
 
     <img iteminf="Shadow" class="MainDiv_CenterDiv_StartInstall_IMG" src="Images/Install_Update_Convert/Items/MainShadow.png"/>
@@ -202,20 +205,20 @@
 
 </div>
 
-<!-- Step 6: Finish and show final result -->
+<!-- Step 7: Finish and show final result -->
 <div class="MainDiv_CenterDiv_FinishInstall Pages">
     <div class="MainDiv_CenterDiv_FinishInstall_LineColor"></div>
-    <div class="row">
-        <label class="MainDiv_CenterDiv_LableBig">Delete Successful</label>
+    <div>
+        <label class="MainDiv_CenterDiv_LableBig">Update Successful</label>
     </div>
-    <div class="row">
+    <div>
         <label class="MainDiv_CenterDiv_Lable">The number of failed scripts</label>
         <br/>
         <label id="MainDiv_CenterDiv_FinishInstall_ScriptErrorCount" class="MainDiv_CenterDiv_Lable">0</label>
     </div>
 
     <form id="form1" runat="server" autocomplete="off">
-        <div class="row">
+        <div>
             <button id="MainDiv_CenterDiv_FinishInstall_BtnError" runat="server" OnServerClick="MainDiv_CenterDiv_FinishInstall_BtnError_OnServerClick" class="MainDiv_CenterDiv_BTN">Login to Site</button>
         </div>
     </form>
@@ -245,9 +248,6 @@
 
     </div>
 </div>
-
-<!-- Logo-->
-<img class="MainDiv_CenterDiv_LogoImg" src="Images/Install_Update_Convert/LOGO.png"/>
 
 </div>
 

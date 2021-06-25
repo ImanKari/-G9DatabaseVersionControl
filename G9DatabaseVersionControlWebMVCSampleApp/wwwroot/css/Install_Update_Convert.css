@@ -168,12 +168,15 @@ body {
     margin-top: 19px;
     overflow: hidden;
     position: relative;
+    transition: 199ms;
     width: 199px;
 }
 
+.MainDiv_CenterDiv_BTN:hover:disabled, .MainDiv_CenterDiv_BTNSmall:hover:disabled, .MainDiv_CenterDiv_BTN:disabled, .MainDiv_CenterDiv_BTNSmall:disabled { background-color: #888787; }
+
 .MainDiv_CenterDiv_BTN:hover {
     background-color: #ffa433;
-    box-shadow: 0 0 3px 1px #222;
+    box-shadow: 0 0 6.9px 1px #222;
 }
 
 #Input_SetDbURL { margin: 0; }
@@ -224,13 +227,6 @@ body {
     width: 100%;
 }
 
-.MainDiv_CenterDiv_LogoImg {
-    bottom: 10px;
-    left: 20px;
-    position: absolute;
-    width: 100px;
-}
-
 .MainDiv_CenterDiv_SetConnectionString {
     position: relative;
     top: 19px;
@@ -278,6 +274,8 @@ body {
 /*قسمت دوم انتخاب نو نصب*/
 
 .MainDiv_CenterDiv_SetInstallData {
+    display: inline-flex;
+    justify-content: center;
     position: relative;
     text-align: center;
     width: 100%;
@@ -286,20 +284,23 @@ body {
 .MainDiv_CenterDiv_Cul {
     border-radius: 3px;
     cursor: pointer;
-    float: left;
     margin: 15px;
     margin-top: 16px;
     overflow: hidden;
     padding: 0;
+    padding: 3.9px;
     position: relative;
     text-align: center;
+    transition: 399ms;
     width: 29%;
-    /*background-color: #ffa400;*/
 }
 
 .MainDiv_CenterDiv_Cul label { cursor: pointer; }
 
-.MainDiv_CenterDiv_Cul:hover { box-shadow: 0 0 1px 1px #fff; }
+.MainDiv_CenterDiv_Cul:hover {
+    box-shadow: 0 0 19px 1px #222222;
+    box-shadow: 0 0 19px 1px rgba(34, 34, 34, 0.69)
+}
 
 .MainDiv_CenterDiv_Row_InstallType {
     position: relative;
@@ -308,8 +309,62 @@ body {
 
 
 
+/* قسمت سوم انتخاب پروژه*/
 
+MainDiv_CenterDiv_ChooseProject {
+    position: relative;
+    text-align: center;
+    width: 100%;
+}
 
+#MainDiv_CenterDiv_ChooseProject_TableDiv {
+    display: block;
+    height: 209px;
+    margin-top: 9.9px;
+    overflow: auto;
+    text-align: center;
+}
+
+table {
+    border-collapse: collapse;
+    margin: 0 auto;
+    width: 86.9%;
+}
+
+thead th {
+    position: sticky;
+    top: 0;
+}
+
+tr:first-child { padding-top: 20px }
+
+#MainDiv_CenterDiv_ChooseProject_TableDiv table tbody td {
+    padding-bottom: 9.9px;
+    padding-top: 9.9px;
+}
+
+#MainDiv_CenterDiv_ChooseProject_TableDiv table thead th {
+    background-color: #222222;
+    box-shadow: 0 3.9px 9px 1px #222;
+    color: #eeeeee;
+    font-size: 13px;
+    font-weight: bold;
+    padding: 3.9px;
+}
+
+#MainDiv_CenterDiv_ChooseProject_TableDiv table tbody tr {
+    background-color: #222222;
+    background-color: rgba(34, 34, 34, 0.49);
+    border-bottom: 1px solid rgba(34, 34, 34, 0.26);
+    color: #eeeeee;
+    cursor: pointer;
+    font-size: 12px;
+    padding-bottom: 3px;
+    padding-top: 3px;
+    transition: 299ms;
+}
+
+#MainDiv_CenterDiv_ChooseProject_TableDiv table tbody tr:hover { background-color: rgba(34, 34, 34, 0.69); }
 
 /*قسمت سوم وارد کردن داده های مورد نیاز برای تصب*/
 
@@ -318,6 +373,14 @@ body {
     text-align: center;
     width: 100%;
 }
+
+#MainDiv_CenterDiv_SetDataForInstall_NewDBDiv {
+    margin-bottom: 39px;
+    margin-top: 59px;
+}
+
+
+.MainDiv_CenterDiv_SetSoftwareName { margin-top: 119px; }
 
 /*قسمت لودینگ*/
 

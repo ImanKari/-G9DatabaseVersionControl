@@ -16,9 +16,9 @@
         CheckExistDatabase,
 
         /// <summary>
-        ///     Request for install software
+        ///     Request for install and update software
         /// </summary>
-        InstallSoftware,
+        InstallSoftwareAndUpdate,
 
         /// <summary>
         ///     Request for update
@@ -26,8 +26,13 @@
         UpdateSoftware,
 
         /// <summary>
-        ///     Request for convert old database data to new database data
+        ///     Request for custom task
         /// </summary>
-        ConvertOldDatabaseToNewDatabase
+        CustomTask,
+
+        /// <summary>
+        /// Request for get last status
+        /// </summary>
+        CheckLastStatus
     }
 }
