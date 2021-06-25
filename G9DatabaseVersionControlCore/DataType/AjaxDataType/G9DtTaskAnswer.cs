@@ -48,5 +48,10 @@ namespace G9DatabaseVersionControlCore.DataType.AjaxDataType
         ///     Specifies row numbers for update
         /// </summary>
         public long RowReceiveNumberCount { set; get; }
+
+        /// <summary>
+        ///     Specifies data for send and receive between backend and frontend
+        /// </summary>
+        public string Data { set; get; }
     }
 }

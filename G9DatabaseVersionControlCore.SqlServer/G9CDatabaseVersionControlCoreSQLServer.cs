@@ -24,40 +24,51 @@ namespace G9DatabaseVersionControlCore.SqlServer
         #region ### Fields And Properties ###
 
         /// <summary>
-        ///     Specifies connection string data source
+        ///     Specifies full connection string
         /// </summary>
-        public readonly string ConnectionStringDataSource;
-
-        /// <summary>
-        ///     Specifies connection string user id
-        /// </summary>
-        public readonly string ConnectionStringUserId;
-
-        /// <summary>
-        ///     Specifies connection string password
-        /// </summary>
-        public readonly string ConnectionStringPassword;
-
-
-        /// <summary>
-        ///     پروپرتی برای نگهداری کانکشن استرینگ دیتابیس
-        /// </summary>
-        public string ConnectionString
-        {
-            get
-            {
-                if (!string.IsNullOrEmpty(ConnectionStringDataSource) &&
-                    !string.IsNullOrEmpty(ConnectionStringDataSource) &&
-                    !string.IsNullOrEmpty(ConnectionStringDataSource))
-                    return ConvertFieldToConnectionString(ConnectionStringDataSource, ConnectionStringUserId,
-                        ConnectionStringPassword);
-                throw new Exception("String connection construction information is incomplete.");
-            }
-        }
+        public readonly string ConnectionString;
 
         #endregion
 
         #region ### Methods ###
+
+        #region ### Constructor ###
+
+        /// <summary>
+        ///     Constructor - Initialize requirement
+        /// </summary>
+        /// <param name="connectionString">Specifies connection string</param>
+        /// <param name="projectName">Specifies project name to access assigned map.</param>
+        /// <exception cref="ArgumentException">
+        ///     If not exist a map for this project name. The method throw exception about the map
+        ///     not found.
+        /// </exception>
+        public G9CDatabaseVersionControlCoreSQLServer(string connectionString, string projectName)
+            : base(projectName)
+        {
+            ConnectionString = connectionString ??
+                               throw new ArgumentNullException(nameof(connectionString));
+            if (!CheckConnectionString(ConnectionString))
+                throw new Exception(
+                    $"The connection string ({ConnectionString}) is incorrect!");
+            CurrentDatabaseVersion = GetDatabaseVersion();
+        }
+
+        /// <summary>
+        ///     Constructor - Initialize requirement
+        /// </summary>
+        /// <param name="connectionString">Specifies connection string</param>
+        /// <param name="map">Specifies a map for assign to project.</param>
+        public G9CDatabaseVersionControlCoreSQLServer(string connectionString, G9DtMap map)
+            : base(map)
+        {
+            ConnectionString = connectionString ??
+                               throw new ArgumentNullException(nameof(connectionString));
+            if (!CheckConnectionString(ConnectionString))
+                throw new Exception(
+                    $"The connection string ({ConnectionString}) is incorrect!");
+            CurrentDatabaseVersion = GetDatabaseVersion();
+        }
 
         /// <summary>
         ///     Constructor - Initialize requirement
@@ -74,16 +85,19 @@ namespace G9DatabaseVersionControlCore.SqlServer
             string connectionStringPassword, string projectName)
             : base(projectName)
         {
-            ConnectionStringDataSource = connectionStringDataSource ??
-                                         throw new ArgumentNullException(nameof(connectionStringDataSource));
-            ConnectionStringUserId =
+            var connectionStringDataSource1 = connectionStringDataSource ??
+                                              throw new ArgumentNullException(nameof(connectionStringDataSource));
+            var connectionStringUserId1 =
                 connectionStringUserId ?? throw new ArgumentNullException(nameof(connectionStringUserId));
-            ConnectionStringPassword = connectionStringPassword ??
-                                       throw new ArgumentNullException(nameof(connectionStringPassword));
-            if (!CheckConnectionString(ConnectionStringDataSource, ConnectionStringUserId, ConnectionStringPassword,
+            var connectionStringPassword1 = connectionStringPassword ??
+                                            throw new ArgumentNullException(nameof(connectionStringPassword));
+            if (!CheckConnectionString(connectionStringDataSource1, connectionStringUserId1, connectionStringPassword1,
                 ProjectMapData.DatabaseName))
                 throw new Exception(
                     $"The entered connection string parameters ({nameof(connectionStringDataSource)}, {nameof(connectionStringUserId)}, {nameof(connectionStringPassword)}) are incorrect!\nConnection string: '{ConvertFieldToConnectionString(connectionStringDataSource, ProjectMapData.DatabaseName, connectionStringUserId, connectionStringPassword)}'");
+
+            ConnectionString = ConvertFieldToConnectionString(connectionStringDataSource, connectionStringUserId,
+                connectionStringPassword);
             CurrentDatabaseVersion = GetDatabaseVersion();
         }
 
@@ -98,19 +112,21 @@ namespace G9DatabaseVersionControlCore.SqlServer
             string connectionStringPassword, G9DtMap map)
             : base(map)
         {
-            ConnectionStringDataSource = connectionStringDataSource ??
-                                         throw new ArgumentNullException(nameof(connectionStringDataSource));
-            ConnectionStringUserId =
+            var connectionStringDataSource1 = connectionStringDataSource ??
+                                              throw new ArgumentNullException(nameof(connectionStringDataSource));
+            var connectionStringUserId1 =
                 connectionStringUserId ?? throw new ArgumentNullException(nameof(connectionStringUserId));
-            ConnectionStringPassword = connectionStringPassword ??
-                                       throw new ArgumentNullException(nameof(connectionStringPassword));
+            var connectionStringPassword1 = connectionStringPassword ??
+                                            throw new ArgumentNullException(nameof(connectionStringPassword));
 
-            if (!CheckConnectionString(ConnectionStringDataSource, ConnectionStringUserId, ConnectionStringPassword,
+            if (!CheckConnectionString(connectionStringDataSource1, connectionStringUserId1, connectionStringPassword1,
                 ProjectMapData.DatabaseName))
                 throw new Exception(
                     $"The entered connection string parameters ({nameof(connectionStringDataSource)}, {nameof(connectionStringUserId)}, {nameof(connectionStringPassword)}) are incorrect!\nConnection string: '{ConvertFieldToConnectionString(connectionStringDataSource, ProjectMapData.DatabaseName, connectionStringUserId, connectionStringPassword)}'");
             CurrentDatabaseVersion = GetDatabaseVersion();
         }
+
+        #endregion
 
         /// <summary>
         ///     Method to check connection string
@@ -132,6 +148,32 @@ namespace G9DatabaseVersionControlCore.SqlServer
                         : new SqlConnection(ConvertFieldToConnectionString(connectionDataSource, connectionUserId,
                             connectionPassword, databaseName))
                 )
+                {
+                    conn.Open();
+                    if (conn.State == ConnectionState.Open)
+                        return true;
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                // Ignore
+                ex.G9SmallLogException();
+                return false;
+            }
+        }
+
+        /// <summary>
+        ///     Method to check connection string
+        /// </summary>
+        /// <param name="connectionString">Specifies connection string</param>
+        /// <param name="databaseName">Specifies database name (Optional)</param>
+        /// <returns></returns>
+        public static bool CheckConnectionString(string connectionString, string databaseName = null)
+        {
+            try
+            {
+                using (var conn = new SqlConnection(connectionString))
                 {
                     conn.Open();
                     if (conn.State == ConnectionState.Open)
@@ -212,8 +254,7 @@ namespace G9DatabaseVersionControlCore.SqlServer
             try
             {
                 using (var connection =
-                    new SqlConnection(ConvertFieldToConnectionString(ConnectionStringDataSource,
-                        ConnectionStringUserId, ConnectionStringPassword)))
+                    new SqlConnection(ConnectionString))
                 {
                     using (var command =
                         new SqlCommand("SELECT db_id('" + ProjectMapData.DatabaseName + "')", connection))
@@ -369,14 +410,15 @@ IF EXISTS
                         throw new Exception(
                             "Can't find the base database setting for this project name. please check the assigned map.");
                     case G9EBaseDatabaseType.CreateBaseDatabaseByBackupDatabasePath:
-                        var success = RestoreDatabase(ProjectMapData.BaseDatabaseBackupPath,
+                        if (!RestoreDatabase(ProjectMapData.BaseDatabaseBackupPath,
                             ProjectMapData.EnableSetCustomDatabaseName && !string.IsNullOrEmpty(customDatabaseName)
                                 ? customDatabaseName
                                 : ProjectMapData.DatabaseName
                             , ProjectMapData.EnableSetCustomDatabaseRestoreFilePath &&
                               !string.IsNullOrEmpty(databaseRestorePath)
                                 ? databaseRestorePath
-                                : null);
+                                : null))
+                            throw new Exception("Error on database restore, Please check log data!");
                         break;
                     case G9EBaseDatabaseType.CreateBaseDatabaseByScriptData:
                         ExecuteQueryWithResult(ProjectMapData.GenerateBaseDatabaseScriptFunc(
@@ -396,7 +438,8 @@ IF EXISTS
                             , ProjectMapData.EnableSetCustomDatabaseRestoreFilePath &&
                               !string.IsNullOrEmpty(databaseRestorePath)
                                 ? databaseRestorePath
-                                : null);
+                                : null
+                            , ConnectionString);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(G9EBaseDatabaseType),

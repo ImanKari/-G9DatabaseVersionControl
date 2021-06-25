@@ -633,6 +633,14 @@ namespace G9DatabaseVersionControlCore
                     TotalMapData.Remove(projectName);
         }
 
+        /// <summary>
+        ///     The method to get total assigned maps
+        /// </summary>
+        public static IList<G9DtMap> GetAssignedMaps()
+        {
+            return TotalMapData.Select(s => s.Value).ToArray();
+        }
+
         #endregion
     }
 }
