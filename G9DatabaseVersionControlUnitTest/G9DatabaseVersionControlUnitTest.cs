@@ -27,55 +27,55 @@ namespace G9DatabaseVersionControlUnitTest
         {
         }
 
-        [Test]
-        [Order(1)]
-        public void TestSmallLoggerWithoutInitialize()
-        {
-            Parallel.For(1, 100, counter =>
-            {
-                if (counter % 4 == 0)
-                    new Exception($"Test Exception: {counter}",
-                            new Exception($"Test Inner Exception: {counter}"))
-                        .G9SmallLogException($"Test Exception Additional Message: {counter}");
-                if (counter % 3 == 0)
-                    $"Test Error: {counter}".G9SmallLogError();
-                if (counter % 2 == 0)
-                    $"Test Warning: {counter}".G9SmallLogWarning();
-                else
-                    $"Test Information: {counter}".G9SmallLogInformation();
-            });
-            Assert.Pass();
-        }
+        //[Test]
+        //[Order(1)]
+        //public void TestSmallLoggerWithoutInitialize()
+        //{
+        //    Parallel.For(1, 100, counter =>
+        //    {
+        //        if (counter % 4 == 0)
+        //            new Exception($"Test Exception: {counter}",
+        //                    new Exception($"Test Inner Exception: {counter}"))
+        //                .G9SmallLogException($"Test Exception Additional Message: {counter}");
+        //        if (counter % 3 == 0)
+        //            $"Test Error: {counter}".G9SmallLogError();
+        //        if (counter % 2 == 0)
+        //            $"Test Warning: {counter}".G9SmallLogWarning();
+        //        else
+        //            $"Test Information: {counter}".G9SmallLogInformation();
+        //    });
+        //    Assert.Pass();
+        //}
 
-        [Test]
-        [Order(2)]
-        public void TestSmallLoggerWitheInitialize()
-        {
-            G9CSmallLogger.Initialize(Environment.CurrentDirectory, "CustomLogPath",
-                $"LogFile-{DateTime.Now:HH-mm-ss.fff}");
-            Parallel.For(1, 100, counter =>
-            {
-                if (counter % 4 == 0)
-                    new Exception($"Test Exception: {counter}",
-                            new Exception($"Test Inner Exception: {counter}"))
-                        .G9SmallLogException($"Test Exception Additional Message: {counter}");
-                if (counter % 3 == 0)
-                    $"Test Error: {counter}".G9SmallLogError();
-                if (counter % 2 == 0)
-                    $"Test Warning: {counter}".G9SmallLogWarning();
-                else
-                    $"Test Information: {counter}".G9SmallLogInformation();
-            });
-            Assert.Pass();
-        }
+        //[Test]
+        //[Order(2)]
+        //public void TestSmallLoggerWitheInitialize()
+        //{
+        //    G9CSmallLogger.Initialize(Environment.CurrentDirectory, "CustomLogPath",
+        //        $"LogFile-{DateTime.Now:HH-mm-ss.fff}");
+        //    Parallel.For(1, 100, counter =>
+        //    {
+        //        if (counter % 4 == 0)
+        //            new Exception($"Test Exception: {counter}",
+        //                    new Exception($"Test Inner Exception: {counter}"))
+        //                .G9SmallLogException($"Test Exception Additional Message: {counter}");
+        //        if (counter % 3 == 0)
+        //            $"Test Error: {counter}".G9SmallLogError();
+        //        if (counter % 2 == 0)
+        //            $"Test Warning: {counter}".G9SmallLogWarning();
+        //        else
+        //            $"Test Information: {counter}".G9SmallLogInformation();
+        //    });
+        //    Assert.Pass();
+        //}
 
-        [Test]
-        [Order(3)]
-        public void TestGetProjectName()
-        {
-            _projectNames = G9CDatabaseVersionControl.GetTotalProjectNames();
-            Assert.True(_projectNames.Count == 4 && _projectNames.All(s => !string.IsNullOrEmpty(s)));
-        }
+        //[Test]
+        //[Order(3)]
+        //public void TestGetProjectName()
+        //{
+        //    _projectNames = G9CDatabaseVersionControl.GetTotalProjectNames();
+        //    Assert.True(_projectNames.Count == 4 && _projectNames.All(s => !string.IsNullOrEmpty(s)));
+        //}
 
 //        [Test]
 //        [Order(4)]
