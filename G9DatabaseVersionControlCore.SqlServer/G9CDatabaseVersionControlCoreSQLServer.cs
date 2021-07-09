@@ -138,7 +138,7 @@ namespace G9DatabaseVersionControlCore.SqlServer
         /// <param name="connectionUserId">Specifies connection string user id</param>
         /// <param name="connectionPassword">Specifies connection string password</param>
         /// <param name="databaseName">Specifies database name (Optional)</param>
-        /// <returns></returns>
+        /// <returns>if the connection string is the correct return true</returns>
         public static bool CheckConnectionString(string connectionDataSource, string connectionUserId,
             string connectionPassword, string databaseName = null)
         {
@@ -153,9 +153,7 @@ namespace G9DatabaseVersionControlCore.SqlServer
                 )
                 {
                     conn.Open();
-                    if (conn.State == ConnectionState.Open)
-                        return true;
-                    return false;
+                    return conn.State == ConnectionState.Open;
                 }
             }
             catch (Exception ex)
@@ -170,18 +168,15 @@ namespace G9DatabaseVersionControlCore.SqlServer
         ///     Method to check connection string
         /// </summary>
         /// <param name="connectionString">Specifies connection string</param>
-        /// <param name="databaseName">Specifies database name (Optional)</param>
-        /// <returns></returns>
-        public static bool CheckConnectionString(string connectionString, string databaseName = null)
+        /// <returns>if the connection string is the correct return true</returns>
+        public static bool CheckConnectionString(string connectionString)
         {
             try
             {
                 using (var conn = new SqlConnection(connectionString))
                 {
                     conn.Open();
-                    if (conn.State == ConnectionState.Open)
-                        return true;
-                    return false;
+                    return conn.State == ConnectionState.Open;
                 }
             }
             catch (Exception ex)
@@ -198,7 +193,7 @@ namespace G9DatabaseVersionControlCore.SqlServer
         /// <param name="connectionUserId">Specifies connection string user id</param>
         /// <param name="connectionPassword">Specifies connection string password</param>
         /// <param name="databaseName">Specifies database name (Optional)</param>
-        /// <returns></returns>
+        /// <returns>Return full connection string</returns>
         public static string ConvertFieldToConnectionString(string connectionDataSource,
             string connectionUserId, string connectionPassword, string databaseName = null)
         {
@@ -290,9 +285,7 @@ namespace G9DatabaseVersionControlCore.SqlServer
                         new SqlCommand("SELECT db_id('" + ProjectMapData.DatabaseName + "')", connection))
                     {
                         connection.Open();
-                        if (command.ExecuteScalar() == DBNull.Value)
-                            return false;
-                        return true;
+                        return command.ExecuteScalar() != DBNull.Value;
                     }
                 }
             }
@@ -460,11 +453,7 @@ IF EXISTS
                             if (!RestoreDatabase(ProjectMapData.BaseDatabaseBackupPath,
                                 ProjectMapData.EnableSetCustomDatabaseName && !string.IsNullOrEmpty(customDatabaseName)
                                     ? customDatabaseName
-                                    : ProjectMapData.DatabaseName
-                                , ProjectMapData.EnableSetCustomDatabaseRestoreFilePath &&
-                                  !string.IsNullOrEmpty(databaseRestorePath)
-                                    ? databaseRestorePath
-                                    : GetDefaultDatabasePath()))
+                                    : ProjectMapData.DatabaseName))
                                 throw new Exception("Error on database restore, Please check log data!");
                             break;
                         case G9EBaseDatabaseType.CreateBaseDatabaseByScriptData:
@@ -731,9 +720,8 @@ VALUES
         /// </summary>
         /// <param name="databaseFullPath">Specifies full path of database(backup)</param>
         /// <param name="databaseName">Specifies database name for restore</param>
-        /// <param name="databaseRestorePath">Specifies a path for restore file.</param>
         /// <returns>If success return true</returns>
-        private bool RestoreDatabase(string databaseFullPath, string databaseName, string databaseRestorePath = null)
+        private bool RestoreDatabase(string databaseFullPath, string databaseName)
         {
             try
             {
@@ -744,34 +732,18 @@ VALUES
                     throw new Exception(
                         $"There is a database with this name and it cannot be restored before deleting it. Database name: {databaseName}");
 
-                // Check database path
-                if (string.IsNullOrEmpty(databaseRestorePath))
-                    throw new Exception("Database path not exists!");
-
-                // Check directory exist
-                if (!Directory.Exists(databaseRestorePath))
-                    throw new Exception($"Directory for restore path not exist! path: {databaseRestorePath}");
-
                 databaseFullPath = Path.GetFullPath(databaseFullPath);
-
-                //@"RESTORE DATABASE [{0}] FROM  DISK = N'{1}' WITH FILE = 1,  MOVE N'PdlWeb_Data' TO N'{2}\\{3}.mdf',  MOVE N'PdlWeb_Log' TO N'{2}\\{3}.ldf',  NOUNLOAD,  STATS = 10",
-                //databaseName,
-                //databaseFullPath,
-                //pathForDatabase,
-                //ProjectMapData.DatabaseName
 
                 using (var sqlCon = new SqlConnection(ConnectionString))
                 {
                     var script =
-                        $@"RESTORE DATABASE [{databaseName}] FROM  DISK = N'{databaseFullPath}' WITH FILE = 1,  MOVE N'{ProjectMapData.DatabaseName}_Data' TO N'{databaseRestorePath}\\{ProjectMapData.DatabaseName}.mdf',  MOVE N'{ProjectMapData.DatabaseName}_Log' TO N'{databaseRestorePath}\\{ProjectMapData.DatabaseName}.ldf',  NOUNLOAD,  STATS = 10";
+                        $@"RESTORE DATABASE [{databaseName}] FROM DISK = N'{databaseFullPath}'";
                     sqlCon.Open();
 
                     using (var sqlCmd = new SqlCommand(script, sqlCon))
                     {
                         sqlCmd.CommandTimeout = 0;
-                        if (sqlCmd.ExecuteNonQuery() != 0)
-                            return true;
-                        return false;
+                        return sqlCmd.ExecuteNonQuery() != 0;
                     }
                 }
             }
@@ -790,12 +762,12 @@ VALUES
         {
             using (var connection = new SqlConnection(ConnectionString))
             {
-                var Script =
+                const string script =
                     "SELECT LEFT(physical_name,LEN(physical_name) - charindex('\\',reverse(physical_name),1) + 1) [path] FROM SYS.database_files WHERE type=0";
 
                 connection.Open();
 
-                using (var command = new SqlCommand(Script, connection))
+                using (var command = new SqlCommand(script, connection))
                 {
                     command.CommandTimeout = 0;
                     using (var reader = command.ExecuteReader())
@@ -821,8 +793,8 @@ VALUES
         /// </summary>
         /// <param name="data">Specifies data for fixed</param>
         /// <param name="maxLength">Specifies maximum length</param>
-        /// <returns></returns>
-        private string FixedLengthFromEndOfString(string data, int maxLength)
+        /// <returns>Return Fixed Length From End Of String</returns>
+        private static string FixedLengthFromEndOfString(string data, int maxLength)
         {
             if (string.IsNullOrEmpty(data)) return data;
             return data.Length > maxLength ? data.Substring(data.Length - maxLength, maxLength) : data;
@@ -830,6 +802,7 @@ VALUES
 
 
         private static G9CDatabaseVersionControlCoreSQLServer _installOrUpdateObject;
+
         public static string HandleTaskRequest(G9DtTaskRequest requestPacket)
         {
             try
@@ -844,40 +817,38 @@ VALUES
                             checkConnectionString.DataSource,
                             checkConnectionString.UserId,
                             checkConnectionString.Password);
-                        if (CheckConnectionString(connectionString))
-                        {
-                            var projectData = JsonConvert.SerializeObject(GetAssignedMaps()
-                                .Select(s =>
-                                    new
-                                    {
-                                        s.ProjectName,
-                                        ProjectVersion = s.ProductVersionFunc(),
-                                        s.DatabaseName,
-                                        DatabaseVersion =
-                                            CheckDatabaseExist(s.DatabaseName,
-                                                connectionString)
-                                                ? new G9CDatabaseVersionControlCoreSQLServer(connectionString, s)
-                                                    .GetDatabaseVersion()
-                                                : "0.0.0.0",
-                                        ExistBaseDatabase = s.BaseDatabaseType != G9EBaseDatabaseType.NotSet,
-                                        ExistConvert = s.CustomTaskFunc != null,
-                                        s.EnableSetCustomDatabaseName,
-                                        s.EnableSetCustomDatabaseRestoreFilePath
-                                    }).ToArray());
-
+                        if (!CheckConnectionString(connectionString))
                             return JsonConvert.SerializeObject(new G9DtTaskAnswer
                             {
-                                Success = true,
-                                Data = projectData
+                                Success = false,
+                                NeedShowMessage = true,
+                                Message = "The fields entered for connecting to the database are incorrect."
                             });
-                        }
+                        var projectData = JsonConvert.SerializeObject(GetAssignedMaps()
+                            .Select(s =>
+                                new
+                                {
+                                    s.ProjectName,
+                                    ProjectVersion = s.ProductVersionFunc(),
+                                    s.DatabaseName,
+                                    DatabaseVersion =
+                                        CheckDatabaseExist(s.DatabaseName,
+                                            connectionString)
+                                            ? new G9CDatabaseVersionControlCoreSQLServer(connectionString, s)
+                                                .GetDatabaseVersion()
+                                            : "0.0.0.0",
+                                    ExistBaseDatabase = s.BaseDatabaseType != G9EBaseDatabaseType.NotSet,
+                                    ExistConvert = s.CustomTaskFunc != null,
+                                    s.EnableSetCustomDatabaseName,
+                                    s.EnableSetCustomDatabaseRestoreFilePath
+                                }).ToArray());
 
                         return JsonConvert.SerializeObject(new G9DtTaskAnswer
                         {
-                            Success = false,
-                            NeedShowMessage = true,
-                            Message = "The fields entered for connecting to the database are incorrect."
+                            Success = true,
+                            Data = projectData
                         });
+
                     case G9ETaskRequest.CheckExistDatabase:
                         var dbExist = JsonConvert.DeserializeObject<G9DtCheckExistDatabase>(requestPacket.JsonData);
                         if (CheckDatabaseExist(dbExist.DatabaseName,
@@ -919,14 +890,14 @@ VALUES
                             Success = true
                         });
                     case G9ETaskRequest.CustomTask:
-                        var startCustomeTask =
+                        var startCustomTask =
                             JsonConvert.DeserializeObject<G9DtStartInstallOrUpdate>(requestPacket.JsonData);
-                        _installOrUpdateObject = new G9CDatabaseVersionControlCoreSQLServer(startCustomeTask.DataSource,
-                            startCustomeTask.UserId, startCustomeTask.Password,
+                        _installOrUpdateObject = new G9CDatabaseVersionControlCoreSQLServer(startCustomTask.DataSource,
+                            startCustomTask.UserId, startCustomTask.Password,
                             GetAssignedMaps()
-                                .First(s => s.ProjectName == startCustomeTask.ProjectName));
+                                .First(s => s.ProjectName == startCustomTask.ProjectName));
                         Task.Run(async () =>
-                            await _installOrUpdateObject.StartCustomTask(startCustomeTask.DatabaseName));
+                            await _installOrUpdateObject.StartCustomTask(startCustomTask.DatabaseName));
                         return JsonConvert.SerializeObject(new G9DtTaskAnswer
                         {
                             Success = true

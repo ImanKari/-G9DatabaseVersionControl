@@ -187,10 +187,6 @@ namespace G9DatabaseVersionControlCore.DataType
         ///     Specifies ability to select the desired name for the database on database create
         ///     or restore step (default is true)
         /// </param>
-        /// <param name="enableSetCustomDatabaseRestoreFilePath">
-        ///     Specifies ability to set custom database restore file path
-        ///     (default is true)
-        /// </param>
         /// <param name="defaultSchemaForTables">Specifies default schema for create required table (default is 'dbo')</param>
         /// <param name="databaseUpdateScriptFileEncoding">Specifies encoding of update script file (default is 'UTF8')</param>
         /// <param name="productVersionFunc">Func for specifies product version (default use Assembly version)</param>
@@ -209,8 +205,7 @@ namespace G9DatabaseVersionControlCore.DataType
         /// </param>
         public G9DtMap(string projectName, string databaseName, string baseDatabasePath,
             G9DtMapDatabaseScriptRequirements databaseScriptRequirements, string databaseUpdateFilesFullPath = null,
-            bool enableCustomDatabaseName = true, bool enableSetCustomDatabaseRestoreFilePath = true,
-            string defaultSchemaForTables = null,
+            bool enableCustomDatabaseName = true, string defaultSchemaForTables = null,
             Encoding databaseUpdateScriptFileEncoding = null, Func<string> productVersionFunc = null,
             Func<string, Action<string>, Func<string, List<Dictionary<string, object>>>, G9DtTaskResult>
                 customTaskFunc = null)
@@ -237,7 +232,7 @@ namespace G9DatabaseVersionControlCore.DataType
             BaseDatabaseBackupPath = baseDatabasePath;
             DatabaseScriptRequirements = databaseScriptRequirements;
             CustomTaskFunc = customTaskFunc;
-            EnableSetCustomDatabaseRestoreFilePath = enableSetCustomDatabaseRestoreFilePath;
+            EnableSetCustomDatabaseRestoreFilePath = false;
             ProductVersionFunc = productVersionFunc ?? (() => G9CDatabaseVersionControl.DefaultProductVersion);
             DatabaseUpdateScriptFileEncoding = databaseUpdateScriptFileEncoding ?? Encoding.UTF8;
             DefaultSchemaForTables = string.IsNullOrEmpty(defaultSchemaForTables)
