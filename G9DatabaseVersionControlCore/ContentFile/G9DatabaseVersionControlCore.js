@@ -1,5 +1,14 @@
 ﻿
 
+window.onload = function() {
+    if (window.jQuery) {
+        // jQuery is loaded  - Ignore
+    } else {
+        // jQuery is not loaded
+        alert("Jquery not available!");
+    }
+};
+
 $(document).ready(function() {
 
     // فیلد برای نگهداری نوع نصب درخواستی که در مرحله دوم توسط کاربر مقدار دهی می شود
@@ -410,17 +419,17 @@ $(document).ready(function() {
         if (TypeOfInstall == 2) {
             CheckDbExist($("#Input_NewDBName").val(),
                 // تابع برای هندل اگر وجود داشت
-                function () {
+                function() {
                     StartInstallAndUpdate();
                 },
                 // تابع برای هندل در صورت عدم وجود دیتابیس
-                function () {
+                function() {
                     ShowMessage("There is no database with this name.",
                         false,
                         true,
-                        StopLoading(function () {
-                            setTimeout(function () {
-                                    StopLoading(function () {
+                        StopLoading(function() {
+                            setTimeout(function() {
+                                    StopLoading(function() {
                                         $(".MainDiv_CenterDiv_SetDataForInstall").fadeIn(369);
                                     });
                                 },
@@ -609,9 +618,11 @@ $(document).ready(function() {
 
         StartLoading(function() {
             SendAndReceiveDataAjax(ReadySendPacket(
-                TypeOfInstall == 3 ? G9ETaskRequest.UpdateSoftware :
-                TypeOfInstall == 1 ? G9ETaskRequest.InstallSoftwareAndUpdate
-                : G9ETaskRequest.CustomTask,
+                    TypeOfInstall == 3
+                    ? G9ETaskRequest.UpdateSoftware
+                    : TypeOfInstall == 1
+                    ? G9ETaskRequest.InstallSoftwareAndUpdate
+                    : G9ETaskRequest.CustomTask,
                     `{DataSource: '${DataSourceTXTB}',  UserId: '${$("#DB_UserId").val()}', Password: '${
                     $("#DB_Password").val()}',  DatabaseName: '${databaseName}',  ProjectName: '${
                     ProjectsMapData[ChooseProjectIndex].ProjectName}',  CustomDatabaseRestorePath: ${DBURL}}`),
@@ -718,7 +729,7 @@ $(document).ready(function() {
     // تابع برای گرفتن آخرین وضعیت نصب
     function CheckLastStatusOfInstall() {
         setTimeout(function() {
-            SendAndReceiveDataAjax(ReadySendPacket(G9ETaskRequest.CheckLastStatus, ""),
+                SendAndReceiveDataAjax(ReadySendPacket(G9ETaskRequest.CheckLastStatus, ""),
                     // اگر تماس به درستی بر قرار شد
                     function(result) {
 

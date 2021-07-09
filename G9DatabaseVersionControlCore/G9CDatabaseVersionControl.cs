@@ -650,6 +650,61 @@ namespace G9DatabaseVersionControlCore
             return TotalMapData.Select(s => s.Value).ToArray();
         }
 
+
+        /// <summary>
+        ///     Get web css data
+        /// </summary>
+        /// <param name="withoutStyleTag">Specifies need to get data with the style tag</param>
+        /// <returns>Web css data</returns>
+        public static string GetWebCssData(bool withoutStyleTag = false)
+        {
+            var assembly = typeof(G9CDatabaseVersionControl).GetTypeInfo().Assembly;
+            const string resourcePath = "G9DatabaseVersionControlCore.ContentFile.G9DatabaseVersionControlCore.css";
+            using (var stream = assembly.GetManifestResourceStream(resourcePath))
+            using (var reader =
+                new StreamReader(stream ?? throw new Exception($"Embedded resource not found!\nPath: {resourcePath}")))
+            {
+                return withoutStyleTag
+                    ? reader.ReadToEnd()
+                    : $"<style>{reader.ReadToEnd()}</style>";
+            }
+        }
+
+        /// <summary>
+        ///     Get web javascript (Jquery) data
+        /// </summary>
+        /// <param name="withoutScriptTag">Specifies need to get data with the script tag</param>
+        /// <returns>web javascript data</returns>
+        public static string GetWebJsData(bool withoutScriptTag = false)
+        {
+            var assembly = typeof(G9CDatabaseVersionControl).GetTypeInfo().Assembly;
+            const string resourcePath = "G9DatabaseVersionControlCore.ContentFile.G9DatabaseVersionControlCore.js";
+            using (var stream = assembly.GetManifestResourceStream(resourcePath))
+            using (var reader =
+                new StreamReader(stream ?? throw new Exception($"Embedded resource not found!\nPath: {resourcePath}")))
+            {
+                return withoutScriptTag
+                    ? reader.ReadToEnd()
+                    : $"<script>{reader.ReadToEnd()}</script>";
+            }
+        }
+
+        /// <summary>
+        ///     Get web html data
+        /// </summary>
+        /// <returns>Web html data</returns>
+        public static string GetWebHtmlData()
+        {
+            var assembly = typeof(G9CDatabaseVersionControl).GetTypeInfo().Assembly;
+            const string resourcePath = "G9DatabaseVersionControlCore.ContentFile.G9DatabaseVersionControlCore.html";
+            using (var stream = assembly.GetManifestResourceStream(resourcePath))
+            using (var reader =
+                new StreamReader(stream ?? throw new Exception($"Embedded resource not found!\nPath: {resourcePath}")))
+            {
+                return reader.ReadToEnd();
+            }
+        }
+
         #endregion
     }
 }
