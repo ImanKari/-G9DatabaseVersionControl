@@ -89,7 +89,7 @@ namespace G9DatabaseVersionControlWebMVCSampleApp.Controllers
                     new G9DtMapDatabaseScriptRequirements(true, true),
 
                     // Custom params:
-                    @"DatabaseUpdateFiles/",
+                    @"DatabaseUpdateFiles\",
                     false,
                     false,
                     "dbo",

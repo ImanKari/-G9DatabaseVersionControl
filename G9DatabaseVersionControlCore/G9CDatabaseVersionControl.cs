@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using G9DatabaseVersionControlCore.Class.SmallLogger;
 using G9DatabaseVersionControlCore.DataType;
 using G9DatabaseVersionControlCore.DataType.AjaxDataType;
+using G9DatabaseVersionControlCore.DataType.AjaxDataType.StepDataType;
 using G9DatabaseVersionControlCore.Enums;
 
 // ReSharper disable UnusedMember.Global
@@ -124,75 +125,113 @@ namespace G9DatabaseVersionControlCore
             try
             {
                 _totalProjects = new Dictionary<string, G9DtProjectInfo>();
-                var projectsPath = GetFolderNamesFromPath(ProjectMapData.DatabaseUpdateFilesFullPath)
-                    .Select(GetFullPathFromPath).ToArray();
-                foreach (var projectPath in projectsPath)
-                {
-                    var projectUpdateFolders = GetFolderNamesFromPath(projectPath);
-                    var foldersInfo = new List<G9DtUpdateFoldersInfo>();
-                    foreach (var projectUpdateFolder in projectUpdateFolders)
-                    {
-                        var updateFilesInfo = new List<G9DtUpdateFilesInfo>();
-                        var projectUpdateFileNames =
-                            GetFilesFromPath(Path.Combine(projectPath, projectUpdateFolder));
 
-                        foreach (var projectUpdateFileName in projectUpdateFileNames)
+                // Get total project update files full path
+                var totalProjectPathData =
+                    TotalMapData.Select(s => s.Value.DatabaseUpdateFilesFullPath).Distinct().ToArray();
+
+                foreach (var projectFullPath in totalProjectPathData)
+                {
+                    var projectsInPath = GetFolderNamesFromPath(projectFullPath).Select(GetFullPathFromPath).ToArray();
+                    foreach (var projectPath in projectsInPath)
+                    {
+                        var projectName = RemovePreFixPath(projectPath);
+                        // Get project map
+                        var map = TotalMapData.Where(s => s.Key == projectName).Select(s => s.Value)
+                            .FirstOrDefault();
+
+                        var projectUpdateFolders = GetFolderNamesFromPath(projectPath);
+                        var foldersInfo = new List<G9DtUpdateFoldersInfo>();
+                        foreach (var projectUpdateFolder in projectUpdateFolders)
                         {
-                            var fileData = File.ReadAllText(projectUpdateFileName,
-                                ProjectMapData.DatabaseUpdateScriptFileEncoding);
-                            var author = GetDataBetweenTwoXmlTag(fileData, "Author");
-                            var description = GetDataBetweenTwoXmlTag(fileData, "Description");
-                            var version = GetDataBetweenTwoXmlTag(fileData, "Version");
-                            DateTime updateDateTime;
+                            var updateFilesInfo = new List<G9DtUpdateFilesInfo>();
+                            var projectUpdateFileNames =
+                                GetFilesFromPath(Path.Combine(projectPath, projectUpdateFolder));
+
+                            foreach (var projectUpdateFileName in projectUpdateFileNames)
+                            {
+                                var fileData = File.ReadAllText(projectUpdateFileName,
+                                    ProjectMapData.DatabaseUpdateScriptFileEncoding);
+                                var author = GetDataBetweenTwoXmlTag(fileData, "Author");
+                                var description = GetDataBetweenTwoXmlTag(fileData, "Description");
+                                var version = GetDataBetweenTwoXmlTag(fileData, "Version");
+                                DateTime updateDateTime;
+                                try
+                                {
+                                    var datetime = GetDataBetweenTwoXmlTag(fileData, "UpdateDateTime");
+                                    updateDateTime = string.IsNullOrEmpty(datetime)
+                                        ? DateTime.MinValue
+                                        : DateTime.Parse(datetime);
+                                }
+                                catch (Exception e)
+                                {
+                                    e.G9SmallLogException();
+                                    // Ignore
+                                    updateDateTime = DateTime.MinValue;
+                                }
+
+                                // Check validation
+                                if (!map.Equals(default(G9DtMap)))
+                                {
+                                    if (map.DatabaseScriptRequirements.IsRequiredToSetAuthor &&
+                                        string.IsNullOrEmpty(author))
+                                        throw new Exception(
+                                            $"Requirement Error! The 'Author' is not set in the update script file! Script path: {projectUpdateFileName}");
+
+                                    if (map.DatabaseScriptRequirements.IsRequiredToSetDescription &&
+                                        string.IsNullOrEmpty(description))
+                                        throw new Exception(
+                                            $"Requirement Error! The 'Description' is not set in the update script file! Script path: {projectUpdateFileName}");
+
+                                    if (map.DatabaseScriptRequirements.IsRequiredToSetVersion &&
+                                        string.IsNullOrEmpty(version))
+                                        throw new Exception(
+                                            $"Requirement Error! The 'Version' is not set in the update script file! Script path: {projectUpdateFileName}");
+
+                                    if (map.DatabaseScriptRequirements.IsRequiredToSetUpdateDateTime &&
+                                        updateDateTime == DateTime.MinValue)
+                                        throw new Exception(
+                                            $"Requirement Error! The 'UpdateDateTime' is not set in the update script file! Script path: {projectUpdateFileName}");
+                                }
+
+                                updateFilesInfo.Add(new G9DtUpdateFilesInfo(GetFullPathFromPath(projectUpdateFileName),
+                                    RemovePreFixPath(projectUpdateFileName), author, description, updateDateTime,
+                                    version,
+                                    fileData));
+                            }
+
+                            var folderName = RemovePreFixPath(projectUpdateFolder);
+                            string folderVersion;
+                            DateTime folderDateTime;
                             try
                             {
-                                var datetime = GetDataBetweenTwoXmlTag(fileData, "UpdateDateTime");
-                                updateDateTime = string.IsNullOrEmpty(datetime)
-                                    ? DateTime.MinValue
-                                    : DateTime.Parse(datetime);
+                                folderVersion = folderName.Substring(0, 7);
+                                if (!int.TryParse(folderVersion.Replace(".", string.Empty), out _))
+                                    throw new Exception("Incorrect folder name!");
+                                folderDateTime =
+                                    DateTime.Parse(
+                                        $"{folderName.Substring(8, 4)}/{folderName.Substring(12, 2)}/{folderName.Substring(14, 2)}",
+                                        CultureInfo.InvariantCulture);
                             }
                             catch (Exception e)
                             {
-                                e.G9SmallLogException();
-                                // Ignore
-                                updateDateTime = DateTime.MinValue;
+                                var exception = new Exception(
+                                    $"There is a problem naming the update folders.\nIncorrect name: '{folderName}'\nStandard name: '1.0.0.0-20210601'",
+                                    e);
+                                exception.G9SmallLogException();
+                                throw exception;
                             }
 
-                            updateFilesInfo.Add(new G9DtUpdateFilesInfo(GetFullPathFromPath(projectUpdateFileName),
-                                RemovePreFixPath(projectUpdateFileName), author, description, updateDateTime, version,
-                                fileData));
+                            foldersInfo.Add(new G9DtUpdateFoldersInfo(GetFullPathFromPath(projectUpdateFolder),
+                                folderName,
+                                folderVersion
+                                , folderDateTime, updateFilesInfo));
                         }
 
-                        var folderName = RemovePreFixPath(projectUpdateFolder);
-                        string folderVersion;
-                        DateTime folderDateTime;
-                        try
-                        {
-                            folderVersion = folderName.Substring(0, 7);
-                            if (!int.TryParse(folderVersion.Replace(".", string.Empty), out _))
-                                throw new Exception("Incorrect folder name!");
-                            folderDateTime =
-                                DateTime.Parse(
-                                    $"{folderName.Substring(8, 4)}/{folderName.Substring(12, 2)}/{folderName.Substring(14, 2)}",
-                                    CultureInfo.InvariantCulture);
-                        }
-                        catch (Exception e)
-                        {
-                            var exception = new Exception(
-                                $"There is a problem naming the update folders.\nIncorrect name: '{folderName}'\nStandard name: '1.0.0.0-20210601'",
-                                e);
-                            exception.G9SmallLogException();
-                            throw exception;
-                        }
-
-                        foldersInfo.Add(new G9DtUpdateFoldersInfo(GetFullPathFromPath(projectUpdateFolder), folderName,
-                            folderVersion
-                            , folderDateTime, updateFilesInfo));
+                        _totalProjects.Add(projectName,
+                            new G9DtProjectInfo(GetFullPathFromPath(projectPath), RemovePreFixPath(projectPath), null,
+                                DateTime.MinValue, foldersInfo));
                     }
-
-                    _totalProjects.Add(RemovePreFixPath(projectPath),
-                        new G9DtProjectInfo(GetFullPathFromPath(projectPath), RemovePreFixPath(projectPath), null,
-                            DateTime.MinValue, foldersInfo));
                 }
             }
             catch (Exception e)
@@ -673,10 +712,14 @@ namespace G9DatabaseVersionControlCore
         /// <summary>
         ///     Get web javascript (Jquery) data
         /// </summary>
+        /// <param name="ajaxMethodAddress">Specifies ajax method address for call web app</param>
         /// <param name="withoutScriptTag">Specifies need to get data with the script tag</param>
         /// <returns>web javascript data</returns>
-        public static string GetWebJsData(bool withoutScriptTag = false)
+        public static string GetWebJsData(string ajaxMethodAddress , bool withoutScriptTag = false)
         {
+            if (string.IsNullOrEmpty(ajaxMethodAddress))
+                throw new ArgumentNullException(nameof(ajaxMethodAddress),
+                    $"Param '{nameof(ajaxMethodAddress)} can't be null or empty!'");
             var assembly = typeof(G9CDatabaseVersionControl).GetTypeInfo().Assembly;
             const string resourcePath = "G9DatabaseVersionControlCore.ContentFile.G9DatabaseVersionControlCore.js";
             using (var stream = assembly.GetManifestResourceStream(resourcePath))
@@ -684,24 +727,30 @@ namespace G9DatabaseVersionControlCore
                 new StreamReader(stream ?? throw new Exception($"Embedded resource not found!\nPath: {resourcePath}")))
             {
                 return withoutScriptTag
-                    ? reader.ReadToEnd()
-                    : $"<script>{reader.ReadToEnd()}</script>";
+                    ? reader.ReadToEnd().Replace("{{G9AjaxMethod}}", ajaxMethodAddress)
+                    : $"<script>{reader.ReadToEnd().Replace("{{G9AjaxMethod}}", ajaxMethodAddress)}</script>";
             }
         }
 
         /// <summary>
         ///     Get web html data
         /// </summary>
+        /// <param name="connectionStrings">Specifies collection of connection strings</param>
         /// <returns>Web html data</returns>
-        public static string GetWebHtmlData()
+        public static string GetWebHtmlData(params G9DtConnectionString[] connectionStrings)
         {
+            var options = "<option datasource=\"G9Custom\" userid=\"0\" password=\"\" selected>Custom</option>";
+            if (connectionStrings != null && connectionStrings.Any())
+                foreach (var cn in connectionStrings)
+                    options += $"<option datasource=\"{cn.DataSource}\" userid=\"{cn.UserId}\" password=\"{cn.Password}\">{cn.DataSource}</option>";
+
             var assembly = typeof(G9CDatabaseVersionControl).GetTypeInfo().Assembly;
             const string resourcePath = "G9DatabaseVersionControlCore.ContentFile.G9DatabaseVersionControlCore.html";
             using (var stream = assembly.GetManifestResourceStream(resourcePath))
             using (var reader =
                 new StreamReader(stream ?? throw new Exception($"Embedded resource not found!\nPath: {resourcePath}")))
             {
-                return reader.ReadToEnd();
+                return reader.ReadToEnd().Replace("{{G9ConnectionString}}", options);
             }
         }
 

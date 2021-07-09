@@ -149,6 +149,8 @@ body {
     font-size: 12px;
     font-weight: bold;
     position: relative;
+    white-space: pre-wrap;
+    width: 100%
 }
 
 .MainDiv_CenterDiv_BTN, .MainDiv_CenterDiv_BTNSmall {
@@ -245,7 +247,7 @@ body {
     position: relative;
 }
 
-.MainDiv_CenterDiv_SetConnectionString_Area input {
+.MainDiv_CenterDiv_SetConnectionString_Area input, select {
     background-color: #eeeeee;
     background-color: rgba(238, 238, 238, 0.72);
     border: solid #222 1px;
@@ -254,6 +256,11 @@ body {
     position: relative;
     text-align: center;
     width: 90%;
+}
+
+input:disabled {
+    background-color: #949292;
+    background-color: rgba(148, 146, 146, 0.72);
 }
 
 .MainDiv_CenterDiv_SetConnectionString_TextArea {

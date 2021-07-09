@@ -226,6 +226,23 @@ $(document).ready(function() {
 
     // ##################################################### هندلر قسمت اول چک کردن کانکشن استرینگ #####################################################
 
+
+    $('#ConnectionSettingSelect').on('change', function () {
+        var selector = $(this).find(":selected");
+        var dataSource = $(selector).attr("datasource");
+        var userId = $(selector).attr("userid");
+        var password = $(selector).attr("password");
+        if (dataSource === "G9Custom") {
+            $("#DB_DataSource, #DB_UserId, #DB_Password").val("");
+            $("#DB_DataSource, #DB_UserId, #DB_Password").prop("disabled", false);
+        } else {
+            $("#DB_DataSource").val(dataSource);
+            $("#DB_UserId").val(userId);
+            $("#DB_Password").val(password);
+            $("#DB_DataSource, #DB_UserId, #DB_Password").prop("disabled", "disabled");
+        }
+    });
+
     $("#Btn_CheckConnectionString").click(function() {
 
         if ($("#DB_DataSource").val() != null &&
@@ -1107,7 +1124,7 @@ $(document).ready(function() {
             });
         } else {
             $.ajax({
-                url: "Home/G9DatabaseVersionControlHandler",
+                url: "{{G9AjaxMethod}}",
                 data: { data: JSON.stringify(DataForSend) },
                 type: "POST",
                 dataType: "text",
