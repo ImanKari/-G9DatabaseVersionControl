@@ -77,90 +77,90 @@ namespace G9DatabaseVersionControlUnitTest
             Assert.True(_projectNames.Count == 4 && _projectNames.All(s => !string.IsNullOrEmpty(s)));
         }
 
-        [Test]
-        [Order(4)]
-        public void TestGetUpdateFiles()
-        {
-            var dbVersionControlForSqlServer = new G9CDatabaseVersionControlCoreSQLServer(_dataSource, _userId,
-                _password, "Project2", _databaseName, "G9TM");
-            // From Base
-            var projects = dbVersionControlForSqlServer.GetUpdateFiles();
-            Assert.True(projects.Count > 0 && projects.All(s => !string.IsNullOrEmpty(s.UpdateFileName)));
-        }
+//        [Test]
+//        [Order(4)]
+//        public void TestGetUpdateFiles()
+//        {
+//            var dbVersionControlForSqlServer = new G9CDatabaseVersionControlCoreSQLServer(_dataSource, _userId,
+//                _password, "Project2", _databaseName, "G9TM");
+//            // From Base
+//            var projects = dbVersionControlForSqlServer.GetUpdateFiles();
+//            Assert.True(projects.Count > 0 && projects.All(s => !string.IsNullOrEmpty(s.UpdateFileName)));
+//        }
 
-        [Test]
-        [Order(5)]
-        public void TestGetUpdateFolders()
-        {
-            var dbVersionControlForSqlServer = new G9CDatabaseVersionControlCoreSQLServer(_dataSource, _userId,
-                _password, "Project2", _databaseName, "G9TM");
-            // From Base
-            var projects =
-                dbVersionControlForSqlServer.GetUpdateFolders();
-            Assert.True(projects.Count > 0 && projects.All(s => !string.IsNullOrEmpty(s.FolderName)));
-        }
+//        [Test]
+//        [Order(5)]
+//        public void TestGetUpdateFolders()
+//        {
+//            var dbVersionControlForSqlServer = new G9CDatabaseVersionControlCoreSQLServer(_dataSource, _userId,
+//                _password, "Project2", _databaseName, "G9TM");
+//            // From Base
+//            var projects =
+//                dbVersionControlForSqlServer.GetUpdateFolders();
+//            Assert.True(projects.Count > 0 && projects.All(s => !string.IsNullOrEmpty(s.FolderName)));
+//        }
 
-        [Test]
-        [Order(6)]
-        public void TestResetDatabase()
-        {
-            var dbVersionControlForSqlServer = new G9CDatabaseVersionControlCoreSQLServer(_dataSource, _userId,
-                _password, "Project1", _databaseName, "G9TM");
-            dbVersionControlForSqlServer.RemoveTablesOfDatabaseVersionControlFromDatabase();
-            Assert.Pass();
-        }
+//        [Test]
+//        [Order(6)]
+//        public void TestResetDatabase()
+//        {
+//            var dbVersionControlForSqlServer = new G9CDatabaseVersionControlCoreSQLServer(_dataSource, _userId,
+//                _password, "Project1", _databaseName, "G9TM");
+//            dbVersionControlForSqlServer.RemoveTablesOfDatabaseVersionControlFromDatabase();
+//            Assert.Pass();
+//        }
 
-        [Test]
-        [Order(7)]
-        public void TestStartUpdate()
-        {
-            var dbVersionControlForSqlServer = new G9CDatabaseVersionControlCoreSQLServer(_dataSource, _userId,
-                _password, "Project1", _databaseName, "G9TM");
-            // From Base
-            dbVersionControlForSqlServer.StartUpdate();
-            Assert.Pass();
-        }
+//        [Test]
+//        [Order(7)]
+//        public void TestStartUpdate()
+//        {
+//            var dbVersionControlForSqlServer = new G9CDatabaseVersionControlCoreSQLServer(_dataSource, _userId,
+//                _password, "Project1", _databaseName, "G9TM");
+//            // From Base
+//            dbVersionControlForSqlServer.StartUpdate();
+//            Assert.Pass();
+//        }
 
-        [Test]
-        [Order(8)]
-        public void TestDataTypeMap()
-        {
-            _mapItems[0] = new G9DtMap("G9DatabaseVersionControlUnitTest", "G9DatabaseVersionControlUnitTest",
-                new G9DtMapDatabaseScriptMandatories(true, true, true, true));
-            Assert.True(_mapItems[0].BaseDatabaseType == G9EBaseDatabaseType.NotSet);
+//        [Test]
+//        [Order(8)]
+//        public void TestDataTypeMap()
+//        {
+//            _mapItems[0] = new G9DtMap("G9DatabaseVersionControlUnitTest", "G9DatabaseVersionControlUnitTest",
+//                new G9DtMapDatabaseScriptMandatories(true, true, true, true));
+//            Assert.True(_mapItems[0].BaseDatabaseType == G9EBaseDatabaseType.NotSet);
 
-            _mapItems[1] = new G9DtMap("Project1", "Project1", "BaseDatabaseBackup/Test.BAK",
-                new G9DtMapDatabaseScriptMandatories(true, true, true, true));
-            Assert.True(_mapItems[1].BaseDatabaseType == G9EBaseDatabaseType.CreateBaseDatabaseByBackupDatabasePath);
+//            _mapItems[1] = new G9DtMap("Project1", "Project1", "BaseDatabaseBackup/Test.BAK",
+//                new G9DtMapDatabaseScriptMandatories(true, true, true, true));
+//            Assert.True(_mapItems[1].BaseDatabaseType == G9EBaseDatabaseType.CreateBaseDatabaseByBackupDatabasePath);
 
-            _mapItems[2] = new G9DtMap("Project2", "Project2", (databaseName, databasePath) =>
-                $@"CREATE DATABASE [{databaseName}]
- CONTAINMENT = NONE
- ON  PRIMARY 
-( NAME = N'Test', FILENAME = N'{databasePath ?? @"C:\Program Files\Microsoft SQL Server\MSSQL15.MSSQLSERVER2019\MSSQL\DATA"}\{databaseName}.mdf' , SIZE = 8192KB , MAXSIZE = UNLIMITED, FILEGROWTH = 65536KB )
- LOG ON 
-( NAME = N'Test_log', FILENAME = N'{databasePath ?? @"C:\Program Files\Microsoft SQL Server\MSSQL15.MSSQLSERVER2019\MSSQL\DATA"}\{databaseName}.ldf' , SIZE = 8192KB , MAXSIZE = 2048GB , FILEGROWTH = 65536KB )
- WITH CATALOG_COLLATION = DATABASE_DEFAULT", new G9DtMapDatabaseScriptMandatories(true, true, true, true));
-            Assert.True(_mapItems[2].BaseDatabaseType == G9EBaseDatabaseType.CreateBaseDatabaseByScriptData);
+//            _mapItems[2] = new G9DtMap("Project2", "Project2", (databaseName, databasePath) =>
+//                $@"CREATE DATABASE [{databaseName}]
+// CONTAINMENT = NONE
+// ON  PRIMARY 
+//( NAME = N'Test', FILENAME = N'{databasePath ?? @"C:\Program Files\Microsoft SQL Server\MSSQL15.MSSQLSERVER2019\MSSQL\DATA"}\{databaseName}.mdf' , SIZE = 8192KB , MAXSIZE = UNLIMITED, FILEGROWTH = 65536KB )
+// LOG ON 
+//( NAME = N'Test_log', FILENAME = N'{databasePath ?? @"C:\Program Files\Microsoft SQL Server\MSSQL15.MSSQLSERVER2019\MSSQL\DATA"}\{databaseName}.ldf' , SIZE = 8192KB , MAXSIZE = 2048GB , FILEGROWTH = 65536KB )
+// WITH CATALOG_COLLATION = DATABASE_DEFAULT", new G9DtMapDatabaseScriptMandatories(true, true, true, true));
+//            Assert.True(_mapItems[2].BaseDatabaseType == G9EBaseDatabaseType.CreateBaseDatabaseByScriptData);
 
-            _mapItems[3] = new G9DtMap("Project3", "Project3g", (databaseName, databasePaths) =>
-                {
-                    // Call on create database
-                    return new G9DtTaskResult();
-                }
-                , new G9DtMapDatabaseScriptMandatories(true, true, true, true),
-                // Disable custom database name for test
-                false);
-            Assert.True(_mapItems[3].BaseDatabaseType == G9EBaseDatabaseType.CreateBaseDatabaseByFunc);
-        }
+//            _mapItems[3] = new G9DtMap("Project3", "Project3g", (databaseName, databasePaths) =>
+//                {
+//                    // Call on create database
+//                    return new G9DtTaskResult();
+//                }
+//                , new G9DtMapDatabaseScriptMandatories(true, true, true, true),
+//                // Disable custom database name for test
+//                false);
+//            Assert.True(_mapItems[3].BaseDatabaseType == G9EBaseDatabaseType.CreateBaseDatabaseByFunc);
+//        }
 
-        [Test]
-        [Order(9)]
-        public void TestAssignMap()
-        {
-            var dbVersionControlForSqlServer = new G9CDatabaseVersionControlCoreSQLServer(_dataSource, _userId,
-                _password, "Project1", _databaseName, "G9TM");
-            //dbVersionControlForSqlServer
-        }
+//        [Test]
+//        [Order(9)]
+//        public void TestAssignMap()
+//        {
+//            var dbVersionControlForSqlServer = new G9CDatabaseVersionControlCoreSQLServer(_dataSource, _userId,
+//                _password, "Project1", _databaseName, "G9TM");
+//            //dbVersionControlForSqlServer
+//        }
     }
 }
