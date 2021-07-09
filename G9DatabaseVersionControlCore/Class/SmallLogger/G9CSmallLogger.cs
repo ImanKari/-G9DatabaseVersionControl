@@ -4,20 +4,21 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;
 using G9DatabaseVersionControlCore.Class.SmallLogger.Enums;
+using G9DatabaseVersionControlCore.Class.SmallLogger.Interface;
 
 namespace G9DatabaseVersionControlCore.Class.SmallLogger
 {
     /// <summary>
     ///     A small script for logging
     /// </summary>
-    public static class G9CSmallLogger
+    public class G9CSmallLogger : G9ISmallLogger
     {
         #region ### Fields And Properties ###
 
         /// <summary>
         ///     Specifies the logger is initialized or no
         /// </summary>
-        public static bool IsInitialize { private set; get; }
+        public bool IsInitialize { private set; get; }
 
         /// <summary>
         ///     Specified log header for info
@@ -42,32 +43,32 @@ namespace G9DatabaseVersionControlCore.Class.SmallLogger
         /// <summary>
         ///     Encoding for log write
         /// </summary>
-        public static Encoding Encoding { private set; get; }
+        public Encoding Encoding { private set; get; }
 
         /// <summary>
         ///     Specified log path
         /// </summary>
-        public static string LogPath { private set; get; }
+        public string LogPath { private set; get; }
 
         /// <summary>
         ///     Specified log directory name
         /// </summary>
-        public static string LogDirectoryName { private set; get; }
+        public string LogDirectoryName { private set; get; }
 
         /// <summary>
         ///     Specified log file name
         /// </summary>
-        public static string LogFileName { private set; get; }
+        public string LogFileName { private set; get; }
 
         /// <summary>
         ///     Specified log full path
         /// </summary>
-        public static string LogFullPath { private set; get; }
+        public string LogFullPath { private set; get; }
 
         /// <summary>
         ///     Use lock
         /// </summary>
-        private static readonly object WriteFileLock = new object();
+        private readonly object _writeFileLock = new object();
 
         #endregion
 
@@ -76,24 +77,16 @@ namespace G9DatabaseVersionControlCore.Class.SmallLogger
         /// <summary>
         ///     Constructor - Initialize requirement
         /// </summary>
-        static G9CSmallLogger()
-        {
-            InitializeRequirement();
-        }
-
-        /// <summary>
-        ///     Method for initialize logger
-        /// </summary>
         /// <param name="logPath">Log path</param>
         /// <param name="logDirectoryName">Log directory name</param>
         /// <param name="logFileName">Log file name</param>
         /// <param name="encoding">Specify the encoding of log</param>
-        public static void Initialize(string logPath = null, string logDirectoryName = null, string logFileName = null,
+        public G9CSmallLogger(string logPath = null, string logDirectoryName = null, string logFileName = null,
             Encoding encoding = null)
         {
             InitializeRequirement(logPath, logDirectoryName, logFileName, encoding);
         }
-
+        
         /// <summary>
         ///     Method for initialize logger
         /// </summary>
@@ -101,7 +94,7 @@ namespace G9DatabaseVersionControlCore.Class.SmallLogger
         /// <param name="logDirectoryName">Log directory name</param>
         /// <param name="logFileName">Log file name</param>
         /// <param name="encoding">Specify the encoding of log</param>
-        private static void InitializeRequirement(string logPath = null, string logDirectoryName = null,
+        private void InitializeRequirement(string logPath = null, string logDirectoryName = null,
             string logFileName = null, Encoding encoding = null)
         {
             LogPath = logPath ?? string.Empty;
@@ -120,23 +113,16 @@ namespace G9DatabaseVersionControlCore.Class.SmallLogger
         /// <summary>
         ///     Method for check requirement
         /// </summary>
-        private static void CheckRequirement()
+        private void CheckRequirement()
         {
             if (!IsInitialize)
                 throw new TypeInitializationException(nameof(G9CSmallLogger),
                     new Exception(
-                        $"Please initialize '{nameof(G9CSmallLogger)}'.\nUse '{nameof(Initialize)}' method for initialized this type."));
+                        $"Please initialize '{nameof(G9CSmallLogger)}'.\nUse 'Constructor' method for initialized this type."));
         }
 
-        /// <summary>
-        ///     Handle information log
-        ///     Used to default instance
-        /// </summary>
-        /// <param name="message">Information message</param>
-        /// <param name="customCallerPath">Custom caller path</param>
-        /// <param name="customCallerName">Custom caller name</param>
-        /// <param name="customLineNumber">Custom line number</param>
-        public static void G9SmallLogInformation(this string message,
+        /// <inheritdoc />
+        public void G9SmallLogInformation(string message,
             [CallerFilePath] string customCallerPath = null,
             [CallerMemberName] string customCallerName = null,
             [CallerLineNumber] int customLineNumber = 0)
@@ -147,15 +133,8 @@ namespace G9DatabaseVersionControlCore.Class.SmallLogger
                 G9ESmallLogTypes.Information);
         }
 
-        /// <summary>
-        ///     Handle information log
-        ///     Used to default instance
-        /// </summary>
-        /// <param name="message">Information message</param>
-        /// <param name="customCallerPath">Custom caller path</param>
-        /// <param name="customCallerName">Custom caller name</param>
-        /// <param name="customLineNumber">Custom line number</param>
-        public static void G9SmallLogWarning(this string message,
+        /// <inheritdoc />
+        public void G9SmallLogWarning(string message,
             [CallerFilePath] string customCallerPath = null,
             [CallerMemberName] string customCallerName = null,
             [CallerLineNumber] int customLineNumber = 0)
@@ -166,15 +145,8 @@ namespace G9DatabaseVersionControlCore.Class.SmallLogger
                 G9ESmallLogTypes.Warning);
         }
 
-        /// <summary>
-        ///     Handle exception log
-        ///     Used to default instance
-        /// </summary>
-        /// <param name="errorMessage">Error message</param>
-        /// <param name="customCallerPath">Custom caller path</param>
-        /// <param name="customCallerName">Custom caller name</param>
-        /// <param name="customLineNumber">Custom line number</param>
-        public static void G9SmallLogError(this string errorMessage,
+        /// <inheritdoc />
+        public void G9SmallLogError(string errorMessage,
             [CallerFilePath] string customCallerPath = null,
             [CallerMemberName] string customCallerName = null,
             [CallerLineNumber] int customLineNumber = 0)
@@ -185,16 +157,8 @@ namespace G9DatabaseVersionControlCore.Class.SmallLogger
                 G9ESmallLogTypes.Error);
         }
 
-        /// <summary>
-        ///     Handle exception log
-        ///     Used to default instance
-        /// </summary>
-        /// <param name="ex">Exception</param>
-        /// <param name="additionalMessage">Additional message</param>
-        /// <param name="customCallerPath">Custom caller path</param>
-        /// <param name="customCallerName">Custom caller name</param>
-        /// <param name="customLineNumber">Custom line number</param>
-        public static void G9SmallLogException(this Exception ex, string additionalMessage = null,
+        /// <inheritdoc />
+        public void G9SmallLogException(Exception ex, string additionalMessage = null,
             [CallerFilePath] string customCallerPath = null,
             [CallerMemberName] string customCallerName = null,
             [CallerLineNumber] int customLineNumber = 0)
@@ -222,7 +186,7 @@ namespace G9DatabaseVersionControlCore.Class.SmallLogger
         /// <param name="logItemData">Log item data</param>
         /// <param name="logType">Specify the log type</param>
         /// <param name="innerLog">Specify log is inner system log</param>
-        private static void WriteLogsToStream(string logItemData, G9ESmallLogTypes logType, bool innerLog = false)
+        private void WriteLogsToStream(string logItemData, G9ESmallLogTypes logType, bool innerLog = false)
         {
             try
             {
@@ -247,7 +211,7 @@ namespace G9DatabaseVersionControlCore.Class.SmallLogger
 
                 sb.Append($"\n[{DateTime.Now:yyyy-MM-dd HH:mm:ss}]: {logItemData}\n\n");
 
-                lock (WriteFileLock)
+                lock (_writeFileLock)
                 {
                     using (var os = new FileStream(LogFullPath, FileMode.OpenOrCreate))
                     {

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using G9DatabaseVersionControlCore.Class.SmallLogger;
+using G9DatabaseVersionControlCore.Class.SmallLogger.Interface;
 using G9DatabaseVersionControlCore.DataType;
 using G9DatabaseVersionControlCore.DataType.AjaxDataType;
 using G9DatabaseVersionControlCore.DataType.AjaxDataType.StepDataType;
@@ -83,6 +84,11 @@ namespace G9DatabaseVersionControlCore
         /// </summary>
         private static readonly Dictionary<string, G9DtMap> TotalMapData = new Dictionary<string, G9DtMap>();
 
+        /// <summary>
+        ///     Access to logger
+        /// </summary>
+        protected static G9ISmallLogger Logger { private set; get; }
+
         #endregion
 
         #region ### Methods ###
@@ -91,12 +97,16 @@ namespace G9DatabaseVersionControlCore
         ///     Constructor - Initialize Requirement
         /// </summary>
         /// <param name="projectName">Specifies project ns assigned map.</param>
+        /// <param name="logger">Specifies custom logger (if null use default logger)</param>
         /// <exception cref="ArgumentException">
         ///     If not exist a map for this project name. The method throw exception about the map
         ///     not found.
         /// </exception>
-        protected G9CDatabaseVersionControl(string projectName)
+        protected G9CDatabaseVersionControl(string projectName, G9ISmallLogger logger = null)
         {
+            // Initialize log
+            Logger = logger ?? new G9CSmallLogger();
+
             if (!TotalMapData.ContainsKey(projectName))
                 throw new ArgumentException(
                     $"Map with this project name not found. please use static method '{nameof(MapProjects)}' or use the constructor with map param.");
@@ -109,8 +119,11 @@ namespace G9DatabaseVersionControlCore
         ///     Constructor - Initialize Requirement
         /// </summary>
         /// <param name="map">Specifies a map for assign to project.</param>
-        protected G9CDatabaseVersionControl(G9DtMap map)
+        /// <param name="logger">Specifies custom logger (if null use default logger)</param>
+        protected G9CDatabaseVersionControl(G9DtMap map, G9ISmallLogger logger = null)
         {
+            // Initialize log
+            Logger = logger ?? new G9CSmallLogger();
             ProjectMapData = map;
             ProductVersion = ProjectMapData.ProductVersionFunc();
             MapProjects(ProjectMapData);
@@ -165,7 +178,7 @@ namespace G9DatabaseVersionControlCore
                                 }
                                 catch (Exception e)
                                 {
-                                    e.G9SmallLogException();
+                                    Logger.G9SmallLogException(e);
                                     // Ignore
                                     updateDateTime = DateTime.MinValue;
                                 }
@@ -218,7 +231,7 @@ namespace G9DatabaseVersionControlCore
                                 var exception = new Exception(
                                     $"There is a problem naming the update folders.\nIncorrect name: '{folderName}'\nStandard name: '1.0.0.0-20210601'",
                                     e);
-                                exception.G9SmallLogException();
+                                Logger.G9SmallLogException(exception);
                                 throw exception;
                             }
 
@@ -236,7 +249,7 @@ namespace G9DatabaseVersionControlCore
             }
             catch (Exception e)
             {
-                e.G9SmallLogException("Error On Cache Data");
+                Logger.G9SmallLogException(e, "Error On Cache Data");
                 throw;
             }
         }
@@ -280,7 +293,7 @@ namespace G9DatabaseVersionControlCore
             }
             catch (Exception e)
             {
-                e.G9SmallLogException();
+                Logger.G9SmallLogException(e);
                 throw;
             }
         }
@@ -315,7 +328,7 @@ namespace G9DatabaseVersionControlCore
             }
             catch (Exception e)
             {
-                e.G9SmallLogException();
+                Logger.G9SmallLogException(e);
                 throw;
             }
         }
@@ -351,7 +364,7 @@ namespace G9DatabaseVersionControlCore
             }
             catch (Exception e)
             {
-                e.G9SmallLogException();
+                Logger.G9SmallLogException(e);
                 throw;
             }
         }
@@ -387,7 +400,7 @@ namespace G9DatabaseVersionControlCore
             }
             catch (Exception e)
             {
-                e.G9SmallLogException();
+                Logger.G9SmallLogException(e);
                 throw;
             }
         }
@@ -411,7 +424,7 @@ namespace G9DatabaseVersionControlCore
             }
             catch (Exception e)
             {
-                e.G9SmallLogException();
+                Logger.G9SmallLogException(e);
                 throw;
             }
         }
@@ -435,7 +448,7 @@ namespace G9DatabaseVersionControlCore
             }
             catch (Exception e)
             {
-                e.G9SmallLogException();
+                Logger.G9SmallLogException(e);
                 throw;
             }
         }
@@ -493,7 +506,7 @@ namespace G9DatabaseVersionControlCore
             }
             catch (Exception e)
             {
-                e.G9SmallLogException();
+                Logger.G9SmallLogException(e);
                 throw;
             }
         }
@@ -518,7 +531,7 @@ namespace G9DatabaseVersionControlCore
             }
             catch (Exception e)
             {
-                e.G9SmallLogException();
+                Logger.G9SmallLogException(e);
                 throw;
             }
         }
@@ -541,7 +554,7 @@ namespace G9DatabaseVersionControlCore
             }
             catch (Exception e)
             {
-                e.G9SmallLogException();
+                Logger.G9SmallLogException(e);
                 throw;
             }
         }
@@ -715,7 +728,7 @@ namespace G9DatabaseVersionControlCore
         /// <param name="ajaxMethodAddress">Specifies ajax method address for call web app</param>
         /// <param name="withoutScriptTag">Specifies need to get data with the script tag</param>
         /// <returns>web javascript data</returns>
-        public static string GetWebJsData(string ajaxMethodAddress , bool withoutScriptTag = false)
+        public static string GetWebJsData(string ajaxMethodAddress, bool withoutScriptTag = false)
         {
             if (string.IsNullOrEmpty(ajaxMethodAddress))
                 throw new ArgumentNullException(nameof(ajaxMethodAddress),
@@ -742,7 +755,8 @@ namespace G9DatabaseVersionControlCore
             var options = "<option datasource=\"G9Custom\" userid=\"0\" password=\"\" selected>Custom</option>";
             if (connectionStrings != null && connectionStrings.Any())
                 foreach (var cn in connectionStrings)
-                    options += $"<option datasource=\"{cn.DataSource}\" userid=\"{cn.UserId}\" password=\"{cn.Password}\">{cn.DataSource}</option>";
+                    options +=
+                        $"<option datasource=\"{cn.DataSource}\" userid=\"{cn.UserId}\" password=\"{cn.Password}\">{cn.DataSource}</option>";
 
             var assembly = typeof(G9CDatabaseVersionControl).GetTypeInfo().Assembly;
             const string resourcePath = "G9DatabaseVersionControlCore.ContentFile.G9DatabaseVersionControlCore.html";

@@ -6,7 +6,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using G9DatabaseVersionControlCore.Class.SmallLogger;
+using G9DatabaseVersionControlCore.Class.SmallLogger.Interface;
 using G9DatabaseVersionControlCore.DataType;
 using G9DatabaseVersionControlCore.DataType.AjaxDataType;
 using G9DatabaseVersionControlCore.DataType.AjaxDataType.StepDataType;
@@ -42,12 +42,13 @@ namespace G9DatabaseVersionControlCore.SqlServer
         /// </summary>
         /// <param name="connectionString">Specifies connection string</param>
         /// <param name="projectName">Specifies project name to access assigned map.</param>
+        /// <param name="logger">Specifies custom logger (if null use default logger)</param>
         /// <exception cref="ArgumentException">
         ///     If not exist a map for this project name. The method throw exception about the map
         ///     not found.
         /// </exception>
-        public G9CDatabaseVersionControlCoreSQLServer(string connectionString, string projectName)
-            : base(projectName)
+        public G9CDatabaseVersionControlCoreSQLServer(string connectionString, string projectName, G9ISmallLogger logger = null)
+            : base(projectName, logger)
         {
             ConnectionString = connectionString ??
                                throw new ArgumentNullException(nameof(connectionString));
@@ -62,8 +63,9 @@ namespace G9DatabaseVersionControlCore.SqlServer
         /// </summary>
         /// <param name="connectionString">Specifies connection string</param>
         /// <param name="map">Specifies a map for assign to project.</param>
-        public G9CDatabaseVersionControlCoreSQLServer(string connectionString, G9DtMap map)
-            : base(map)
+        /// <param name="logger">Specifies custom logger (if null use default logger)</param>
+        public G9CDatabaseVersionControlCoreSQLServer(string connectionString, G9DtMap map, G9ISmallLogger logger = null)
+            : base(map, logger)
         {
             ConnectionString = connectionString ??
                                throw new ArgumentNullException(nameof(connectionString));
@@ -80,13 +82,14 @@ namespace G9DatabaseVersionControlCore.SqlServer
         /// <param name="connectionStringUserId">Specifies connection string user id</param>
         /// <param name="connectionStringPassword">Specifies connection string password</param>
         /// <param name="projectName">Specifies project name to access assigned map.</param>
+        /// <param name="logger">Specifies custom logger (if null use default logger)</param>
         /// <exception cref="ArgumentException">
         ///     If not exist a map for this project name. The method throw exception about the map
         ///     not found.
         /// </exception>
         public G9CDatabaseVersionControlCoreSQLServer(string connectionStringDataSource, string connectionStringUserId,
-            string connectionStringPassword, string projectName)
-            : base(projectName)
+            string connectionStringPassword, string projectName, G9ISmallLogger logger = null)
+            : base(projectName, logger)
         {
             var connectionStringDataSource1 = connectionStringDataSource ??
                                               throw new ArgumentNullException(nameof(connectionStringDataSource));
@@ -110,9 +113,10 @@ namespace G9DatabaseVersionControlCore.SqlServer
         /// <param name="connectionStringUserId">Specifies connection string user id</param>
         /// <param name="connectionStringPassword">Specifies connection string password</param>
         /// <param name="map">Specifies a map for assign to project.</param>
+        /// <param name="logger">Specifies custom logger (if null use default logger)</param>
         public G9CDatabaseVersionControlCoreSQLServer(string connectionStringDataSource, string connectionStringUserId,
-            string connectionStringPassword, G9DtMap map)
-            : base(map)
+            string connectionStringPassword, G9DtMap map, G9ISmallLogger logger = null)
+            : base(map, logger)
         {
             var connectionStringDataSource1 = connectionStringDataSource ??
                                               throw new ArgumentNullException(nameof(connectionStringDataSource));
@@ -159,7 +163,7 @@ namespace G9DatabaseVersionControlCore.SqlServer
             catch (Exception ex)
             {
                 // Ignore
-                ex.G9SmallLogException();
+                Logger.G9SmallLogException(ex);
                 return false;
             }
         }
@@ -182,7 +186,7 @@ namespace G9DatabaseVersionControlCore.SqlServer
             catch (Exception ex)
             {
                 // Ignore
-                ex.G9SmallLogException();
+                Logger.G9SmallLogException(ex);
                 return false;
             }
         }
@@ -205,7 +209,7 @@ namespace G9DatabaseVersionControlCore.SqlServer
             }
             catch (Exception ex)
             {
-                ex.G9SmallLogException();
+                Logger.G9SmallLogException(ex);
                 throw;
             }
         }
@@ -241,7 +245,7 @@ namespace G9DatabaseVersionControlCore.SqlServer
             }
             catch (Exception e)
             {
-                e.G9SmallLogException();
+                Logger.G9SmallLogException(e);
                 return false;
             }
         }
@@ -268,7 +272,7 @@ namespace G9DatabaseVersionControlCore.SqlServer
             }
             catch (Exception e)
             {
-                e.G9SmallLogException();
+                Logger.G9SmallLogException(e);
                 return false;
             }
         }
@@ -291,7 +295,7 @@ namespace G9DatabaseVersionControlCore.SqlServer
             }
             catch (Exception e)
             {
-                e.G9SmallLogException();
+                Logger.G9SmallLogException(e);
                 return false;
             }
         }
@@ -394,7 +398,7 @@ IF EXISTS
             }
             catch (Exception ex)
             {
-                ex.G9SmallLogException();
+                Logger.G9SmallLogException(ex);
                 return false;
             }
         }
@@ -501,7 +505,7 @@ IF EXISTS
                 }
                 catch (Exception ex)
                 {
-                    ex.G9SmallLogException();
+                    Logger.G9SmallLogException(ex);
                     throw;
                 }
             });
@@ -561,12 +565,12 @@ IF EXISTS
                         }
                     }
 
-                "Database not found! backup fail!".G9SmallLogError();
+                Logger.G9SmallLogError("Database not found! backup fail!");
                 return false;
             }
             catch (Exception e)
             {
-                e.G9SmallLogException();
+                Logger.G9SmallLogException(e);
                 return false;
             }
         }
@@ -594,8 +598,8 @@ IF EXISTS
                     }
                     catch (Exception ex)
                     {
-                        $"Error on update the database version.\nQuery: {queryDatabaseVersionUpdate}\nException Message: {ex.Message}"
-                            .G9SmallLogError();
+                        Logger.G9SmallLogError(
+                            $"Error on update the database version.\nQuery: {queryDatabaseVersionUpdate}\nException Message: {ex.Message}");
                         PlusCountOfTaskError();
                         // Ignore
                     }
@@ -618,16 +622,16 @@ VALUES
                             }
                             catch (Exception ex)
                             {
-                                $"Error on update the database update history.\nQuery: {queryUpdateHistory}\nException Message: {ex.Message}"
-                                    .G9SmallLogError();
+                                Logger.G9SmallLogError(
+                                    $"Error on update the database update history.\nQuery: {queryUpdateHistory}\nException Message: {ex.Message}");
                                 PlusCountOfTaskError();
                                 // Ignore
                             }
                         }
                         catch (Exception ex)
                         {
-                            $"Error on execute update script.\nScript path: {file.UpdateFileFullPath}\nException Message: {ex.Message}"
-                                .G9SmallLogError();
+                            Logger.G9SmallLogError(
+                                $"Error on execute update script.\nScript path: {file.UpdateFileFullPath}\nException Message: {ex.Message}");
                             PlusCountOfTaskError();
                             // Ignore
 
@@ -644,8 +648,8 @@ VALUES
                             }
                             catch (Exception ex2)
                             {
-                                $"Error on update the database update history.\nQuery: {queryUpdateHistory}\nException Message: {ex2.Message}"
-                                    .G9SmallLogError();
+                                Logger.G9SmallLogError(
+                                    $"Error on update the database update history.\nQuery: {queryUpdateHistory}\nException Message: {ex2.Message}");
                                 PlusCountOfTaskError();
                                 // Ignore
                             }
@@ -659,7 +663,7 @@ VALUES
             }
             catch (Exception ex)
             {
-                ex.G9SmallLogException();
+                Logger.G9SmallLogException(ex);
                 throw;
             }
         }
@@ -749,7 +753,7 @@ VALUES
             }
             catch (Exception e)
             {
-                e.G9SmallLogException();
+                Logger.G9SmallLogException(e);
                 return false;
             }
         }
