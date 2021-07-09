@@ -460,7 +460,7 @@ IF EXISTS
                             ExecuteQueryWithoutResult(ProjectMapData.GenerateBaseDatabaseScriptFunc(
                                 ProjectMapData.EnableSetCustomDatabaseName && !string.IsNullOrEmpty(customDatabaseName)
                                     ? customDatabaseName
-                                    : null
+                                    : ProjectMapData.DatabaseName
                                 , ProjectMapData.EnableSetCustomDatabaseRestoreFilePath &&
                                   !string.IsNullOrEmpty(databaseRestorePath)
                                     ? databaseRestorePath

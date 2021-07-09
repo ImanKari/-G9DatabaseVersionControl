@@ -33,6 +33,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="ContentFile\G9DatabaseVersionControlCore.css">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ContentFile\G9DatabaseVersionControlCore.html" />
+    <EmbeddedResource Include="ContentFile\G9DatabaseVersionControlCore.js">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </EmbeddedResource>
     <Content Include="tools\Init.ps1">
       <PackagePath>tools\</PackagePath>
     </Content>
@@ -40,6 +49,12 @@
 
   <ItemGroup>
     <None Include="build\*.*" Pack="true" PackagePath="build"></None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="ContentFile\G9DatabaseVersionControlCore.css" />
+    <None Remove="ContentFile\G9DatabaseVersionControlCore.html" />
+    <None Remove="ContentFile\G9DatabaseVersionControlCore.js" />
   </ItemGroup>
 
   <ItemGroup>
