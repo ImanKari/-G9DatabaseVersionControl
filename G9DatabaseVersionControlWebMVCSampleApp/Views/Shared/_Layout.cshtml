@@ -1,4 +1,5 @@
 ﻿@using G9DatabaseVersionControlCore
+@using G9DatabaseVersionControlCore.DataType.AjaxDataType.StepDataType
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,12 +10,26 @@
     <link rel="stylesheet" href="~/css/site.css"/>
     <script src="/js/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
 
-    @Html.Raw(G9CDatabaseVersionControl.GetWebJsData())
+    @Html.Raw(G9CDatabaseVersionControl.GetWebJsData("Home/G9DatabaseVersionControlHandler"))
     @Html.Raw(G9CDatabaseVersionControl.GetWebCssData())
 </head>
 <body>
 @RenderBody()
-@Html.Raw(G9CDatabaseVersionControl.GetWebHtmlData())
+@Html.Raw(G9CDatabaseVersionControl.GetWebHtmlData(new G9DtConnectionString[]
+{
+    new G9DtConnectionString()
+    {
+        DataSource = @"GAM3R-IK\MSSQLSERVER2019",
+        UserId = "sa",
+        Password = "Pass1234"
+    },
+    new G9DtConnectionString()
+    {
+        DataSource = @"GAM3R-IK\MSSQLSERVER2008",
+        UserId = "sa2",
+        Password = "Pass1234"
+    }
+}))
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 <script src="~/js/site.js" asp-append-version="true"></script>
 @RenderSection("Scripts", false)

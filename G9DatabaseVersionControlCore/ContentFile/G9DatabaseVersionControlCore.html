@@ -40,26 +40,30 @@
             </div>
 
             <div class="MainDiv_CenterDiv_SetConnectionString_Area">
+                
+                <select id="ConnectionSettingSelect" class="MainDiv_CenterDiv_SetConnectionString_Area" style="top: 9px; width: 66.9%;">
+                    {{G9ConnectionString}}
+                </select>
 
                 <div class="MainDiv_CenterDiv_Row">
 
                     <div class="MainDiv_CenterDiv_Col">
                         <label>Data Source</label>
                         <br />
-                        <input id="DB_DataSource" type="text" value="GAM3R-IK\MSSQLSERVER2019" />
+                        <input id="DB_DataSource" type="text"/>
                     </div>
 
                     <div class="MainDiv_CenterDiv_Col">
                         <label>User Id</label>
                         <br />
-                        <input id="DB_UserId" type="text" value="sa" />
+                        <input id="DB_UserId" type="text"/>
                     </div>
                 </div>
 
                 <div class="MainDiv_CenterDiv_Row" style="height: 10px;">
                     <label>Password</label>
                     <br />
-                    <input id="DB_Password" type="password" value="Pass1234" />
+                    <input id="DB_Password" type="password"/>
                 </div>
             </div>
 
