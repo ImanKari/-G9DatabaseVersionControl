@@ -5,4 +5,9 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\G9DatabaseVersionControlCore.SqlServer\G9DatabaseVersionControlCore.SqlServer.csproj" />
+    <ProjectReference Include="..\G9DatabaseVersionControlCore\G9DatabaseVersionControlCore.csproj" />
+  </ItemGroup>
+
 </Project>
