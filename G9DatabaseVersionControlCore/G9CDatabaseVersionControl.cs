@@ -20,7 +20,7 @@ namespace G9DatabaseVersionControlCore
     /// <summary>
     ///     A core class for database version control
     /// </summary>
-    public abstract class G9CDatabaseVersionControl
+    public abstract partial class G9CDatabaseVersionControl
     {
         #region ### Fields And Properties ###
 
@@ -85,9 +85,23 @@ namespace G9DatabaseVersionControlCore
         private static readonly Dictionary<string, G9DtMap> TotalMapData = new Dictionary<string, G9DtMap>();
 
         /// <summary>
+        /// Save logger object
+        /// </summary>
+        private static G9ISmallLogger _logger;
+
+        /// <summary>
         ///     Access to logger
         /// </summary>
-        protected static G9ISmallLogger Logger { private set; get; }
+        protected static G9ISmallLogger Logger
+        {
+            private set => _logger = value;
+            get
+            {
+                if (_logger == null)
+                    _logger = new G9CSmallLogger();
+                return _logger;
+            }
+        }
 
         #endregion
 
@@ -628,9 +642,10 @@ namespace G9DatabaseVersionControlCore
         /// <summary>
         ///     Method for execute custom task
         /// </summary>
+        /// <param name="nicknameOfCustomTask">Specifies nickname of custom task for execute custom task</param>
         /// <param name="customDatabaseName">Specifies custom database name for restore</param>
         /// <returns>If successful the method will return 'true' </returns>
-        public abstract Task<bool> StartCustomTask(string customDatabaseName = null);
+        public abstract Task<bool> StartCustomTask(string nicknameOfCustomTask, string customDatabaseName = null);
 
         /// <summary>
         ///     Method for get backup from a database
@@ -700,72 +715,6 @@ namespace G9DatabaseVersionControlCore
         public static IList<G9DtMap> GetAssignedMaps()
         {
             return TotalMapData.Select(s => s.Value).ToArray();
-        }
-
-
-        /// <summary>
-        ///     Get web css data
-        /// </summary>
-        /// <param name="withoutStyleTag">Specifies need to get data with the style tag</param>
-        /// <returns>Web css data</returns>
-        public static string GetWebCssData(bool withoutStyleTag = false)
-        {
-            var assembly = typeof(G9CDatabaseVersionControl).GetTypeInfo().Assembly;
-            const string resourcePath = "G9DatabaseVersionControlCore.ContentFile.G9DatabaseVersionControlCore.css";
-            using (var stream = assembly.GetManifestResourceStream(resourcePath))
-            using (var reader =
-                new StreamReader(stream ?? throw new Exception($"Embedded resource not found!\nPath: {resourcePath}")))
-            {
-                return withoutStyleTag
-                    ? reader.ReadToEnd()
-                    : $"<style>{reader.ReadToEnd()}</style>";
-            }
-        }
-
-        /// <summary>
-        ///     Get web javascript (Jquery) data
-        /// </summary>
-        /// <param name="ajaxMethodAddress">Specifies ajax method address for call web app</param>
-        /// <param name="withoutScriptTag">Specifies need to get data with the script tag</param>
-        /// <returns>web javascript data</returns>
-        public static string GetWebJsData(string ajaxMethodAddress, bool withoutScriptTag = false)
-        {
-            if (string.IsNullOrEmpty(ajaxMethodAddress))
-                throw new ArgumentNullException(nameof(ajaxMethodAddress),
-                    $"Param '{nameof(ajaxMethodAddress)} can't be null or empty!'");
-            var assembly = typeof(G9CDatabaseVersionControl).GetTypeInfo().Assembly;
-            const string resourcePath = "G9DatabaseVersionControlCore.ContentFile.G9DatabaseVersionControlCore.js";
-            using (var stream = assembly.GetManifestResourceStream(resourcePath))
-            using (var reader =
-                new StreamReader(stream ?? throw new Exception($"Embedded resource not found!\nPath: {resourcePath}")))
-            {
-                return withoutScriptTag
-                    ? reader.ReadToEnd().Replace("{{G9AjaxMethod}}", ajaxMethodAddress)
-                    : $"<script>{reader.ReadToEnd().Replace("{{G9AjaxMethod}}", ajaxMethodAddress)}</script>";
-            }
-        }
-
-        /// <summary>
-        ///     Get web html data
-        /// </summary>
-        /// <param name="connectionStrings">Specifies collection of connection strings</param>
-        /// <returns>Web html data</returns>
-        public static string GetWebHtmlData(params G9DtConnectionString[] connectionStrings)
-        {
-            var options = "<option datasource=\"G9Custom\" userid=\"0\" password=\"\" selected>Custom</option>";
-            if (connectionStrings != null && connectionStrings.Any())
-                foreach (var cn in connectionStrings)
-                    options +=
-                        $"<option datasource=\"{cn.DataSource}\" userid=\"{cn.UserId}\" password=\"{cn.Password}\">{cn.DataSource}</option>";
-
-            var assembly = typeof(G9CDatabaseVersionControl).GetTypeInfo().Assembly;
-            const string resourcePath = "G9DatabaseVersionControlCore.ContentFile.G9DatabaseVersionControlCore.html";
-            using (var stream = assembly.GetManifestResourceStream(resourcePath))
-            using (var reader =
-                new StreamReader(stream ?? throw new Exception($"Embedded resource not found!\nPath: {resourcePath}")))
-            {
-                return reader.ReadToEnd().Replace("{{G9ConnectionString}}", options);
-            }
         }
 
         #endregion

@@ -50,6 +50,7 @@ body {
 .MainDiv_CenterDiv_ItemCount {
     align-items: center;
     display: flex;
+    display: none !important;
     height: 400px;
     justify-content: center;
     margin: 0;
@@ -92,7 +93,7 @@ body {
     width: 100%;
 }
 
-.MainDiv_CenterDiv_MessageDiv {
+.MainDiv_CenterDiv_MessageDiv, .MainDiv_CenterDiv_CustomTaskDiv {
     background-color: #222222;
     background-color: rgba(34, 34, 34, 0.69);
     height: 100%;
@@ -102,7 +103,7 @@ body {
     width: 100%;
 }
 
-.MainDiv_CenterDiv_MessageDiv_MainDiv {
+.MainDiv_CenterDiv_MessageDiv_MainDiv, .MainDiv_CenterDiv_CustomTaskDiv_MainDiv {
     background-color: slategray;
     box-shadow: 0 3px 9px 3px #222;
     color: #eee;
@@ -112,6 +113,25 @@ body {
     top: 0;
     width: 100%;
 }
+
+.MainDiv_CenterDiv_CustomTaskDiv_MainDiv {
+    background: #002e4c;
+    height: auto;
+}
+
+.MainDiv_CenterDiv_CustomTaskDiv {
+    background: #222222;
+    background: rgba(34, 34, 34, 0.89);
+    color: #eee;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    width: 100%;
+}
+
+.CustomTaskLabel { color: #eeeeee; }
+
+#MainDiv_CenterDiv_CustomTaskDiv_MainDiv_Accept, #MainDiv_CenterDiv_CustomTaskDiv_MainDiv_Denied { background-color: #ffa400; }
 
 .MainDiv_CenterDiv_Row {
     color: #222;

@@ -23,13 +23,18 @@
         public string DatabaseName;
 
         /// <summary>
-        /// Specifies project name
+        ///     Specifies project name
         /// </summary>
         public string ProjectName;
 
         /// <summary>
-        /// Specifies Custom Database Restore Path
+        ///     Specifies Custom Database Restore Path
         /// </summary>
         public string CustomDatabaseRestorePath;
+
+        /// <summary>
+        ///     Specifies nick name of custom task
+        /// </summary>
+        public string CustomTaskNickname;
     }
 }

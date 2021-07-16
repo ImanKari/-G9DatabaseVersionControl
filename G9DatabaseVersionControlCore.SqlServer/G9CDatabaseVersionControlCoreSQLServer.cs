@@ -47,7 +47,8 @@ namespace G9DatabaseVersionControlCore.SqlServer
         ///     If not exist a map for this project name. The method throw exception about the map
         ///     not found.
         /// </exception>
-        public G9CDatabaseVersionControlCoreSQLServer(string connectionString, string projectName, G9ISmallLogger logger = null)
+        public G9CDatabaseVersionControlCoreSQLServer(string connectionString, string projectName,
+            G9ISmallLogger logger = null)
             : base(projectName, logger)
         {
             ConnectionString = connectionString ??
@@ -64,7 +65,8 @@ namespace G9DatabaseVersionControlCore.SqlServer
         /// <param name="connectionString">Specifies connection string</param>
         /// <param name="map">Specifies a map for assign to project.</param>
         /// <param name="logger">Specifies custom logger (if null use default logger)</param>
-        public G9CDatabaseVersionControlCoreSQLServer(string connectionString, G9DtMap map, G9ISmallLogger logger = null)
+        public G9CDatabaseVersionControlCoreSQLServer(string connectionString, G9DtMap map,
+            G9ISmallLogger logger = null)
             : base(map, logger)
         {
             ConnectionString = connectionString ??
@@ -512,12 +514,26 @@ IF EXISTS
         }
 
         /// <inheritdoc />
-        public override async Task<bool> StartCustomTask(string customDatabaseName = null)
+        public override async Task<bool> StartCustomTask(string nicknameOfCustomTask, string customDatabaseName = null)
         {
             return await Task.Run(() =>
             {
-                if (ProjectMapData.CustomTaskFunc == null)
-                    throw new Exception("Custom func is not available! please check assigned map.");
+                if (string.IsNullOrEmpty(nicknameOfCustomTask))
+                    throw new ArgumentNullException(nameof(nicknameOfCustomTask),
+                        $"Parameter '{nameof(nicknameOfCustomTask)} can't be null or empty.'");
+
+                if (ProjectMapData.CustomTasks == null)
+                    throw new Exception("Custom tasks is not available! please check assigned map.");
+
+                var customTask = ProjectMapData.CustomTasks.FirstOrDefault(s => s.Nickname == nicknameOfCustomTask);
+
+                if (customTask.Equals(default(G9DtCustomTask)))
+                    throw new Exception(
+                        $"Custom func with this nickname '{nicknameOfCustomTask}' is not available! please check assigned map.");
+
+                if (customTask.CustomTaskFunc == null)
+                    throw new Exception(
+                        $"Custom func for custom task '{nicknameOfCustomTask}' can't be null! please check assigned map.");
 
                 SetLastTaskStatus(G9ETaskStatus.UpdateDataBase, 0);
 
@@ -530,7 +546,7 @@ IF EXISTS
                 CreateRequirementTables();
 
                 // Step 3: If there was an update for the current version  => Execute update scripts on the database
-                ProjectMapData.CustomTaskFunc(customDatabaseName, ExecuteQueryWithoutResult, ExecuteQueryWithResult);
+                customTask.CustomTaskFunc(customDatabaseName, ExecuteQueryWithoutResult, ExecuteQueryWithResult);
 
                 SetLastTaskStatus(G9ETaskStatus.UpdateDataBase, 100);
 
@@ -842,7 +858,9 @@ VALUES
                                                 .GetDatabaseVersion()
                                             : "0.0.0.0",
                                     ExistBaseDatabase = s.BaseDatabaseType != G9EBaseDatabaseType.NotSet,
-                                    ExistConvert = s.CustomTaskFunc != null,
+                                    CustomTasksItems = s.CustomTasks.Any()
+                                        ? s.CustomTasks.Select(x => new {x.Nickname, x.Description}).ToArray()
+                                        : null,
                                     s.EnableSetCustomDatabaseName,
                                     s.EnableSetCustomDatabaseRestoreFilePath
                                 }).ToArray());
@@ -901,7 +919,7 @@ VALUES
                             GetAssignedMaps()
                                 .First(s => s.ProjectName == startCustomTask.ProjectName));
                         Task.Run(async () =>
-                            await _installOrUpdateObject.StartCustomTask(startCustomTask.DatabaseName));
+                            await _installOrUpdateObject.StartCustomTask(startCustomTask.CustomTaskNickname, startCustomTask.DatabaseName));
                         return JsonConvert.SerializeObject(new G9DtTaskAnswer
                         {
                             Success = true
