@@ -22,11 +22,19 @@ $(document).ready(function() {
             DatabaseName: "",
             DatabaseVersion: "",
             ExistBaseDatabase: false,
-            ExistConvert: false,
+            CustomTasksItems: [
+                {
+                    Nickname: "",
+                    Description: ""
+                }
+            ],
             EnableSetCustomDatabaseName: false,
             EnableSetCustomDatabaseRestoreFilePath: false
         }
     ];
+
+    // متغیر برای نگهداری نام مستعار تسک دلخواه 
+    var CustomTaskNickName = null;
 
     // پروژه انتخاب شده را مشخص می کند
     var ChooseProjectIndex;
@@ -128,7 +136,7 @@ $(document).ready(function() {
 
     // آماده سازی و مقدار دهی اولیه آیتم های نمایشی پیام
     var FuncIfAccept, FuncIfDenied;
-    $(".MainDiv_CenterDiv_MessageDiv").fadeOut();
+    $(".MainDiv_CenterDiv_MessageDiv, .MainDiv_CenterDiv_CustomTaskDiv").fadeOut();
     $(".MainDiv_CenterDiv_MessageDiv_MainDiv").hide();
     $(".MainDiv_CenterDiv_MessageDiv_MainDiv").children().fadeOut();
     $(".MainDiv_CenterDiv_MessageDiv_MainDiv").css({ "height": "0px" });
@@ -227,21 +235,22 @@ $(document).ready(function() {
     // ##################################################### هندلر قسمت اول چک کردن کانکشن استرینگ #####################################################
 
 
-    $('#ConnectionSettingSelect').on('change', function () {
-        var selector = $(this).find(":selected");
-        var dataSource = $(selector).attr("datasource");
-        var userId = $(selector).attr("userid");
-        var password = $(selector).attr("password");
-        if (dataSource === "G9Custom") {
-            $("#DB_DataSource, #DB_UserId, #DB_Password").val("");
-            $("#DB_DataSource, #DB_UserId, #DB_Password").prop("disabled", false);
-        } else {
-            $("#DB_DataSource").val(dataSource);
-            $("#DB_UserId").val(userId);
-            $("#DB_Password").val(password);
-            $("#DB_DataSource, #DB_UserId, #DB_Password").prop("disabled", "disabled");
-        }
-    });
+    $("#ConnectionSettingSelect").on("change",
+        function() {
+            const selector = $(this).find(":selected");
+            const dataSource = $(selector).attr("datasource");
+            const userId = $(selector).attr("userid");
+            const password = $(selector).attr("password");
+            if (dataSource === "G9Custom") {
+                $("#DB_DataSource, #DB_UserId, #DB_Password").val("");
+                $("#DB_DataSource, #DB_UserId, #DB_Password").prop("disabled", false);
+            } else {
+                $("#DB_DataSource").val(dataSource);
+                $("#DB_UserId").val(userId);
+                $("#DB_Password").val(password);
+                $("#DB_DataSource, #DB_UserId, #DB_Password").prop("disabled", "disabled");
+            }
+        });
 
     $("#Btn_CheckConnectionString").click(function() {
 
@@ -279,7 +288,7 @@ $(document).ready(function() {
                             function(index) {
                                 if (ProjectsMapData[index].ExistBaseDatabase)
                                     existProjectWithBaseDatabase = true;
-                                if (ProjectsMapData[index].ExistConvert)
+                                if (ProjectsMapData[index].CustomTasksItems)
                                     existProjectWithCustomTask = true;
                             });
                         if (!existProjectWithBaseDatabase)
@@ -344,7 +353,7 @@ $(document).ready(function() {
                             <td>${ProjectsMapData[index].DatabaseName}</td>
                             <td>${ProjectsMapData[index].DatabaseVersion}</td>
                         </tr>`);
-                } else if (TypeOfInstall === 2 && ProjectsMapData[index].ExistConvert) {
+                } else if (TypeOfInstall === 2 && ProjectsMapData[index].CustomTasksItems) {
                     $("#ChooseProjectTbody").append(
                         `<tr projectIndex="${index}" projectname="${ProjectsMapData[index].ProjectName}">
                             <td>${ProjectsMapData[index].ProjectName}</td>
@@ -376,19 +385,61 @@ $(document).ready(function() {
     $(document).on("click",
         "tr[projectname]",
         function() {
+            debugger;
             ChooseProjectName = $(this).attr("projectname");
             ChooseProjectIndex = parseInt($(this).attr("projectIndex"));
-            $("#Input_NewDBName").val(ProjectsMapData[ChooseProjectIndex].DatabaseName);
-            if (ProjectsMapData[ChooseProjectIndex].EnableSetCustomDatabaseName) {
-                $("#Input_NewDBName").prop("disabled", false);
+            if (TypeOfInstall === 2) {
+                var optionItems = "";
+                $.each(ProjectsMapData[ChooseProjectIndex].CustomTasksItems,
+                    function(index, item) {
+                        optionItems += `<option description="${item.Description}">${item.Nickname}</option>`;
+                    });
+                $("#MainDiv_CenterDiv_CustomTaskDiv_Select_CustomTaskNickName").empty();
+                $("#MainDiv_CenterDiv_CustomTaskDiv_Select_CustomTaskNickName").append(optionItems);
+                $("#MainDiv_CenterDiv_CustomTaskDiv_Description_CustomTaskNickName")
+                    .text(ProjectsMapData[ChooseProjectIndex].CustomTasksItems[0].Description);
+                $("#MainDiv_CenterDiv_CustomTaskDiv_MainDiv_Accept").attr("projectname", ChooseProjectName);
+                $("#MainDiv_CenterDiv_CustomTaskDiv_MainDiv_Accept").attr("projectIndex", ChooseProjectIndex);
+                $(".MainDiv_CenterDiv_CustomTaskDiv").fadeIn(369);
             } else {
-                $("#Input_NewDBName").prop("disabled", true);
+                $("#Input_NewDBName").val(ProjectsMapData[ChooseProjectIndex].DatabaseName);
+                if (ProjectsMapData[ChooseProjectIndex].EnableSetCustomDatabaseName) {
+                    $("#Input_NewDBName").prop("disabled", false);
+                } else {
+                    $("#Input_NewDBName").prop("disabled", true);
+                }
+                $(".MainDiv_CenterDiv_ChooseProject").fadeOut(369,
+                    function() {
+                        $(".MainDiv_CenterDiv_SetDataForInstall").fadeIn(369);
+                    });
             }
-            $(".MainDiv_CenterDiv_ChooseProject").fadeOut(369,
-                function() {
-                    $(".MainDiv_CenterDiv_SetDataForInstall").fadeIn(369);
-                });
         });
+
+    $("#MainDiv_CenterDiv_CustomTaskDiv_Select_CustomTaskNickName").change(function() {
+        $("#MainDiv_CenterDiv_CustomTaskDiv_Description_CustomTaskNickName")
+            .text($(this).find(":selected").attr("description"));
+    });
+
+    $("#MainDiv_CenterDiv_CustomTaskDiv_MainDiv_Denied").click(function() {
+        $(".MainDiv_CenterDiv_CustomTaskDiv").fadeOut(199);
+    });
+
+    $("#MainDiv_CenterDiv_CustomTaskDiv_MainDiv_Accept").click(function() {
+        CustomTaskNickName = $("#MainDiv_CenterDiv_CustomTaskDiv_Select_CustomTaskNickName").val();
+        $(".MainDiv_CenterDiv_CustomTaskDiv").fadeOut(39);
+        ChooseProjectName = $(this).attr("projectname");
+        ChooseProjectIndex = parseInt($(this).attr("projectIndex"));
+        $("#Input_NewDBName").val(ProjectsMapData[ChooseProjectIndex].DatabaseName);
+        if (ProjectsMapData[ChooseProjectIndex].EnableSetCustomDatabaseName) {
+            $("#Input_NewDBName").prop("disabled", false);
+        } else {
+            $("#Input_NewDBName").prop("disabled", true);
+        }
+        $(".MainDiv_CenterDiv_ChooseProject").fadeOut(369,
+            function() {
+                $(".MainDiv_CenterDiv_SetDataForInstall").fadeIn(369);
+            });
+    });
 
     // ##################################################### هندلر قسمت سوم وارد انتخاب پروژه  #####################################################
 
@@ -632,7 +683,7 @@ $(document).ready(function() {
         var databaseName = $("#Input_NewDBName").val();
         if (!ProjectsMapData[ChooseProjectIndex].EnableSetCustomDatabaseName)
             databaseName = ProjectsMapData[ChooseProjectIndex].DatabaseName;
-
+        debugger;
         StartLoading(function() {
             SendAndReceiveDataAjax(ReadySendPacket(
                     TypeOfInstall == 3
@@ -642,7 +693,7 @@ $(document).ready(function() {
                     : G9ETaskRequest.CustomTask,
                     `{DataSource: '${DataSourceTXTB}',  UserId: '${$("#DB_UserId").val()}', Password: '${
                     $("#DB_Password").val()}',  DatabaseName: '${databaseName}',  ProjectName: '${
-                    ProjectsMapData[ChooseProjectIndex].ProjectName}',  CustomDatabaseRestorePath: ${DBURL}}`),
+                    ProjectsMapData[ChooseProjectIndex].ProjectName}', CustomDatabaseRestorePath: ${DBURL}, CustomTaskNickname: '${CustomTaskNickName}'}`),
                 function(resualt) {
                     if (resualt.Success) {
                         setTimeout(function() {

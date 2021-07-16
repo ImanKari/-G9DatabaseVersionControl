@@ -1,9 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using G9DatabaseVersionControlCore.Enums;
+
+// ReSharper disable UnusedMember.Global
 
 namespace G9DatabaseVersionControlCore.DataType
 {
@@ -97,21 +98,9 @@ namespace G9DatabaseVersionControlCore.DataType
         public readonly Func<string> ProductVersionFunc;
 
         /// <summary>
-        ///     Func for execute custom task
-        ///     <para />
-        ///     <para />
-        ///     First param: string => Specifies database name (Can't be null)
-        ///     <para />
-        ///     Second param: Action(string) => Access to action for execute a query on database without result
-        ///     <para />
-        ///     Third param: Fun(Dictionary(string, object)) => Access to func for execute a query on database with result (List
-        ///     specifies rows and dictionary specifies column and value)
-        ///     <para />
-        ///     Fourth param: Specifies task is successful or no (func answer)
+        ///     Collection for custom task
         /// </summary>
-        public readonly
-            Func<string, Action<string>, Func<string, List<Dictionary<string, object>>>, G9DtTaskResult>
-            CustomTaskFunc;
+        public readonly G9DtCustomTask[] CustomTasks;
 
         #endregion
 
@@ -127,25 +116,11 @@ namespace G9DatabaseVersionControlCore.DataType
         /// <param name="defaultSchemaForTables">Specifies default schema for create required table (default is 'dbo')</param>
         /// <param name="databaseUpdateScriptFileEncoding">Specifies encoding of update script file (default is 'UTF8')</param>
         /// <param name="productVersionFunc">Func for specifies product version (default use Assembly version)</param>
-        /// <param name="customTaskFunc">
-        ///     Func for execute custom task
-        ///     <para />
-        ///     <para />
-        ///     First param: string => Specifies database name (Can't be null)
-        ///     <para />
-        ///     Second param: Action(string) => Access to action for execute a query on database without result
-        ///     <para />
-        ///     Third param: Fun(Dictionary(string, object)) => Access to func for execute a query on database with result (List
-        ///     specifies rows and dictionary specifies column and value)
-        ///     <para />
-        ///     Fourth param: Specifies task is successful or no (func answer)
-        /// </param>
+        /// <param name="customTasks">Specifies custom tasks</param>
         public G9DtMap(string projectName, string databaseName,
             G9DtMapDatabaseScriptRequirements databaseScriptRequirements, string databaseUpdateFilesFullPath = null,
             string defaultSchemaForTables = null, Encoding databaseUpdateScriptFileEncoding = null,
-            Func<string> productVersionFunc = null,
-            Func<string, Action<string>, Func<string, List<Dictionary<string, object>>>, G9DtTaskResult>
-                customTaskFunc = null)
+            Func<string> productVersionFunc = null, params G9DtCustomTask[] customTasks)
         {
             DatabaseUpdateFilesFullPath = string.IsNullOrEmpty(databaseUpdateFilesFullPath)
                 ? G9CDatabaseVersionControl.DefaultDatabaseUpdateFilesFullPath
@@ -159,7 +134,7 @@ namespace G9DatabaseVersionControlCore.DataType
             ProjectName = projectName;
             DatabaseName = databaseName;
             DatabaseScriptRequirements = databaseScriptRequirements;
-            CustomTaskFunc = customTaskFunc;
+            CustomTasks = customTasks;
             ProductVersionFunc = productVersionFunc ?? (() => G9CDatabaseVersionControl.DefaultProductVersion);
             DatabaseUpdateScriptFileEncoding = databaseUpdateScriptFileEncoding ?? Encoding.UTF8;
             DefaultSchemaForTables = string.IsNullOrEmpty(defaultSchemaForTables)
@@ -190,25 +165,12 @@ namespace G9DatabaseVersionControlCore.DataType
         /// <param name="defaultSchemaForTables">Specifies default schema for create required table (default is 'dbo')</param>
         /// <param name="databaseUpdateScriptFileEncoding">Specifies encoding of update script file (default is 'UTF8')</param>
         /// <param name="productVersionFunc">Func for specifies product version (default use Assembly version)</param>
-        /// <param name="customTaskFunc">
-        ///     Func for execute custom task
-        ///     <para />
-        ///     <para />
-        ///     First param: string => Specifies database name (Can't be null)
-        ///     <para />
-        ///     Second param: Action(string) => Access to action for execute a query on database without result
-        ///     <para />
-        ///     Third param: Fun(Dictionary(string, object)) => Access to func for execute a query on database with result (List
-        ///     specifies rows and dictionary specifies column and value)
-        ///     <para />
-        ///     Fourth param: Specifies task is successful or no (func answer)
-        /// </param>
+        /// <param name="customTasks">Specifies custom tasks</param>
         public G9DtMap(string projectName, string databaseName, string baseDatabasePath,
             G9DtMapDatabaseScriptRequirements databaseScriptRequirements, string databaseUpdateFilesFullPath = null,
             bool enableCustomDatabaseName = true, string defaultSchemaForTables = null,
             Encoding databaseUpdateScriptFileEncoding = null, Func<string> productVersionFunc = null,
-            Func<string, Action<string>, Func<string, List<Dictionary<string, object>>>, G9DtTaskResult>
-                customTaskFunc = null)
+            params G9DtCustomTask[] customTasks)
         {
             DatabaseUpdateFilesFullPath = string.IsNullOrEmpty(databaseUpdateFilesFullPath)
                 ? G9CDatabaseVersionControl.DefaultDatabaseUpdateFilesFullPath
@@ -231,7 +193,7 @@ namespace G9DatabaseVersionControlCore.DataType
             DatabaseName = databaseName;
             BaseDatabaseBackupPath = baseDatabasePath;
             DatabaseScriptRequirements = databaseScriptRequirements;
-            CustomTaskFunc = customTaskFunc;
+            CustomTasks = customTasks;
             EnableSetCustomDatabaseRestoreFilePath = false;
             ProductVersionFunc = productVersionFunc ?? (() => G9CDatabaseVersionControl.DefaultProductVersion);
             DatabaseUpdateScriptFileEncoding = databaseUpdateScriptFileEncoding ?? Encoding.UTF8;
@@ -273,27 +235,14 @@ namespace G9DatabaseVersionControlCore.DataType
         /// <param name="defaultSchemaForTables">Specifies default schema for create required table (default is 'dbo')</param>
         /// <param name="databaseUpdateScriptFileEncoding">Specifies encoding of update script file (default is 'UTF8')</param>
         /// <param name="productVersionFunc">Func for specifies product version (default use Assembly version)</param>
-        /// <param name="customTaskFunc">
-        ///     Func for execute custom task
-        ///     <para />
-        ///     <para />
-        ///     First param: string => Specifies database name (Can't be null)
-        ///     <para />
-        ///     Second param: Action(string) => Access to action for execute a query on database without result
-        ///     <para />
-        ///     Third param: Fun(Dictionary(string, object)) => Access to func for execute a query on database with result (List
-        ///     specifies rows and dictionary specifies column and value)
-        ///     <para />
-        ///     Fourth param: Specifies task is successful or no (func answer)
-        /// </param>
+        /// <param name="customTasks">Specifies custom tasks</param>
         public G9DtMap(string projectName, string databaseName,
             Func<string, string, string> generateBaseDatabaseScriptFunc,
             G9DtMapDatabaseScriptRequirements databaseScriptRequirements, string databaseUpdateFilesFullPath = null,
             bool enableCustomDatabaseName = true, bool enableSetCustomDatabaseRestoreFilePath = true,
             string defaultSchemaForTables = null,
             Encoding databaseUpdateScriptFileEncoding = null, Func<string> productVersionFunc = null,
-            Func<string, Action<string>, Func<string, List<Dictionary<string, object>>>, G9DtTaskResult>
-                customTaskFunc = null)
+            params G9DtCustomTask[] customTasks)
         {
             DatabaseUpdateFilesFullPath = string.IsNullOrEmpty(databaseUpdateFilesFullPath)
                 ? G9CDatabaseVersionControl.DefaultDatabaseUpdateFilesFullPath
@@ -311,7 +260,7 @@ namespace G9DatabaseVersionControlCore.DataType
                 nameof(generateBaseDatabaseScriptFunc),
                 $"Param '{nameof(generateBaseDatabaseScriptFunc)}' can't be null!");
             DatabaseScriptRequirements = databaseScriptRequirements;
-            CustomTaskFunc = customTaskFunc;
+            CustomTasks = customTasks;
             EnableSetCustomDatabaseRestoreFilePath = enableSetCustomDatabaseRestoreFilePath;
             ProductVersionFunc = productVersionFunc ?? (() => G9CDatabaseVersionControl.DefaultProductVersion);
             DatabaseUpdateScriptFileEncoding = databaseUpdateScriptFileEncoding ?? Encoding.UTF8;
@@ -356,27 +305,14 @@ namespace G9DatabaseVersionControlCore.DataType
         /// <param name="defaultSchemaForTables">Specifies default schema for create required table (default is 'dbo')</param>
         /// <param name="databaseUpdateScriptFileEncoding">Specifies encoding of update script file (default is 'UTF8')</param>
         /// <param name="productVersionFunc">Func for specifies product version (default use Assembly version)</param>
-        /// <param name="customeTaskFunc">
-        ///     Func for execute custom task
-        ///     <para />
-        ///     <para />
-        ///     First param: string => Specifies database name (Can't be null)
-        ///     <para />
-        ///     Second param: Action(string) => Access to action for execute a query on database without result
-        ///     <para />
-        ///     Third param: Fun(Dictionary(string, object)) => Access to func for execute a query on database with result (List
-        ///     specifies rows and dictionary specifies column and value)
-        ///     <para />
-        ///     Fourth param: Specifies task is successful or no (func answer)
-        /// </param>
+        /// <param name="customTasks">Specifies custom tasks</param>
         public G9DtMap(string projectName, string databaseName,
             Func<string, string, object, G9DtTaskResult> createDatabaseFunc,
             G9DtMapDatabaseScriptRequirements databaseScriptRequirements, string databaseUpdateFilesFullPath = null,
             bool enableCustomDatabaseName = true, bool enableSetCustomDatabaseRestoreFilePath = true,
             string defaultSchemaForTables = null,
             Encoding databaseUpdateScriptFileEncoding = null, Func<string> productVersionFunc = null,
-            Func<string, Action<string>, Func<string, List<Dictionary<string, object>>>, G9DtTaskResult>
-                customeTaskFunc = null)
+            params G9DtCustomTask[] customTasks)
         {
             DatabaseUpdateFilesFullPath = string.IsNullOrEmpty(databaseUpdateFilesFullPath)
                 ? G9CDatabaseVersionControl.DefaultDatabaseUpdateFilesFullPath
@@ -394,7 +330,7 @@ namespace G9DatabaseVersionControlCore.DataType
             CreateDatabaseFunc = createDatabaseFunc ?? throw new ArgumentNullException(nameof(createDatabaseFunc),
                 $"Param '{nameof(createDatabaseFunc)}' can't be null!");
             DatabaseScriptRequirements = databaseScriptRequirements;
-            CustomTaskFunc = customeTaskFunc;
+            CustomTasks = customTasks;
             EnableSetCustomDatabaseRestoreFilePath = enableSetCustomDatabaseRestoreFilePath;
             ProductVersionFunc = productVersionFunc ?? (() => G9CDatabaseVersionControl.DefaultProductVersion);
             DatabaseUpdateScriptFileEncoding = databaseUpdateScriptFileEncoding ?? Encoding.UTF8;

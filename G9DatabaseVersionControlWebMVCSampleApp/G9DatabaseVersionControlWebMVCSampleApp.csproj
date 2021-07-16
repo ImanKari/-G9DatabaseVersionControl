@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\G9DatabaseVersionControlCore.SqlServer\G9DatabaseVersionControlCore.SqlServer.csproj" />
+    <ProjectReference Include="..\G9DatabaseVersionControlCore.WebOutput\G9DatabaseVersionControlCore.WebOutput.csproj" />
     <ProjectReference Include="..\G9DatabaseVersionControlCore\G9DatabaseVersionControlCore.csproj" />
   </ItemGroup>
 

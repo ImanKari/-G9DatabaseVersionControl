@@ -1,0 +1,52 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net45;net451;net452;netstandard1.3;netstandard1.4;netstandard1.5;netstandard1.6;netstandard2.0;netstandard2.1</TargetFrameworks>
+    <Version>2.0.0.3</Version>
+    <Authors>G9Studio</Authors>
+    <Product>G9 Database Version Control Web Output</Product>
+    <Description>G9 Database Version Control Web Output | Web output ready to manage database version</Description>
+    <Copyright>G9Studio - 2021</Copyright>
+    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+    <PackageProjectUrl>http://www.G9TM.com</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/ImanKari/G9DatabaseVersionControl</RepositoryUrl>
+    <PackageIcon>G9-Icon.png</PackageIcon>
+    <PackageIconUrl />
+    <RepositoryType>GitHub</RepositoryType>
+    <PackageTags>Database DB Version Control DatabaseVersion DatabaseVersionControl DatabaseVersionControlWebOutput WebOutput Web Output</PackageTags>
+    <PackageReleaseNotes>-- Add web output as new project</PackageReleaseNotes>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="ContentFile\G9DatabaseVersionControlCoreWebOutput.css" />
+    <None Remove="ContentFile\G9DatabaseVersionControlCoreWebOutput.html" />
+    <None Remove="ContentFile\G9DatabaseVersionControlCoreWebOutput.js" />
+    <None Include="G9-Icon.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+    <None Include="LICENSE.md">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="ContentFile\G9DatabaseVersionControlCoreWebOutput.css">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ContentFile\G9DatabaseVersionControlCoreWebOutput.html" />
+    <EmbeddedResource Include="ContentFile\G9DatabaseVersionControlCoreWebOutput.js">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\G9DatabaseVersionControlCore\G9DatabaseVersionControlCore.csproj" />
+  </ItemGroup>
+
+</Project>
