@@ -3,12 +3,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 using G9DatabaseVersionControlCore;
 using G9DatabaseVersionControlCore.DataType;
 using G9DatabaseVersionControlCore.DataType.AjaxDataType;
-using G9DatabaseVersionControlCore.DataType.AjaxDataType.StepDataType;
-using G9DatabaseVersionControlCore.Enums;
 using G9DatabaseVersionControlCore.SqlServer;
 using G9DatabaseVersionControlWebMVCSampleApp.EfCoreTest;
 using G9DatabaseVersionControlWebMVCSampleApp.Models;
@@ -95,20 +92,38 @@ namespace G9DatabaseVersionControlWebMVCSampleApp.Controllers
                     "dbo",
                     Encoding.UTF8,
                     GetProjectVersion,
-                    (dbName, actionExecuteQueryWithoutResult, funcExecuteQueryWithResult) =>
-                    {
-                        // Custom func
-                        try
+                    new G9DtCustomTask("Test",
+                        "At first, check to exist schema with name Test, if not exist then create it",
+                        (dbName, actionExecuteQueryWithoutResult, funcExecuteQueryWithResult) =>
                         {
-                            if (!funcExecuteQueryWithResult("SELECT 1 FROM sys.schemas WHERE name = 'Test'").Any())
-                                actionExecuteQueryWithoutResult("CREATE SCHEMA [Test]");
-                            return new G9DtTaskResult();
-                        }
-                        catch (Exception ex)
+                            // Custom func
+                            try
+                            {
+                                if (!funcExecuteQueryWithResult("SELECT 1 FROM sys.schemas WHERE name = 'Test'").Any())
+                                    actionExecuteQueryWithoutResult("CREATE SCHEMA [Test]");
+                                return new G9DtTaskResult();
+                            }
+                            catch (Exception ex)
+                            {
+                                return new G9DtTaskResult(ex.Message);
+                            }
+                        }),
+                    new G9DtCustomTask("Test2",
+                        "At first, check to exist schema with name Test2, if not exist then create it\nAt first, check to exist schema with name Test2, if not exist then create it\nAt first, check to exist schema with name Test2, if not exist then create it\nAt first, check to exist schema with name Test2, if not exist then create it\nAt first, check to exist schema with name Test2, if not exist then create it\nAt first, check to exist schema with name Test2, if not exist then create it",
+                        (dbName, actionExecuteQueryWithoutResult, funcExecuteQueryWithResult) =>
                         {
-                            return new G9DtTaskResult(ex.Message);
-                        }
-                    });
+                            // Custom func
+                            try
+                            {
+                                if (!funcExecuteQueryWithResult("SELECT 1 FROM sys.schemas WHERE name = 'Test2'").Any())
+                                    actionExecuteQueryWithoutResult("CREATE SCHEMA [Test2]");
+                                return new G9DtTaskResult();
+                            }
+                            catch (Exception ex)
+                            {
+                                return new G9DtTaskResult(ex.Message);
+                            }
+                        }));
 
 
             G9CDatabaseVersionControl.MapProjects(map1, map2, map3, map4);

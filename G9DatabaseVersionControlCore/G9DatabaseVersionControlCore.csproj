@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>net45;net451;net452;netstandard1.3;netstandard1.4;netstandard1.5;netstandard1.6;netstandard2.0;netstandard2.1</TargetFrameworks>
-    <Version>1.1.0.4</Version>
+    <Version>2.0.0.3</Version>
     <Authors>Iman Kari</Authors>
     <Company>G9Studio</Company>
     <Product>G9 Database Version Control</Product>
@@ -11,14 +11,19 @@
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
     <PackageProjectUrl>http://www.G9TM.com</PackageProjectUrl>
     <PackageIcon>G9-Icon.png</PackageIcon>
-    <RepositoryUrl>https://github.com/ImanKari/G9DBVC</RepositoryUrl>
+    <RepositoryUrl>https://github.com/ImanKari/G9DatabaseVersionControl</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>Database DB Version Control DatabaseVersion DatabaseVersionControl</PackageTags>
-    <PackageReleaseNotes>-- Fixed Initialize Requirements</PackageReleaseNotes>
+    <PackageReleaseNotes>-- Fixed default logger
+-- Separate web content from the core
+-- Add Web output ready project to manage database version
+-- Fixed connection string drop down in web output
+-- Support multi custom task
+-- Add choose multi task in UI</PackageReleaseNotes>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <AssemblyVersion>1.1.0.4</AssemblyVersion>
-    <FileVersion>1.1.0.4</FileVersion>
+    <AssemblyVersion>2.0.0.3</AssemblyVersion>
+    <FileVersion>2.0.0.3</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -33,15 +38,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="ContentFile\G9DatabaseVersionControlCore.css">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ContentFile\G9DatabaseVersionControlCore.html" />
-    <EmbeddedResource Include="ContentFile\G9DatabaseVersionControlCore.js">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </EmbeddedResource>
     <Content Include="tools\Init.ps1">
       <PackagePath>tools\</PackagePath>
     </Content>
@@ -49,12 +45,6 @@
 
   <ItemGroup>
     <None Include="build\*.*" Pack="true" PackagePath="build"></None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="ContentFile\G9DatabaseVersionControlCore.css" />
-    <None Remove="ContentFile\G9DatabaseVersionControlCore.html" />
-    <None Remove="ContentFile\G9DatabaseVersionControlCore.js" />
   </ItemGroup>
 
   <ItemGroup>
