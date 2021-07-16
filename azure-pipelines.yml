@@ -46,7 +46,18 @@ steps:
       --skip-duplicate
 
 - task: DotNetCoreCLI@2
-  displayName: "Publish Server nuget packages to nuget.org"
+  displayName: "Publish G9DatabaseVersionControlCore.WebOutput Library nuget packages to nuget.org"
+  inputs:
+    command: custom
+    custom: nuget
+    arguments: >
+      push $(Pipeline.Workspace)/**/G9DatabaseVersionControlCore.WebOutput/bin/Release/*.nupkg
+      -s https://api.nuget.org/v3/index.json
+      -k $(NuGetApiKey) 
+      --skip-duplicate
+
+- task: DotNetCoreCLI@2
+  displayName: "Publish G9DatabaseVersionControlCore.SqlServer nuget packages to nuget.org"
   inputs:
     command: custom
     custom: nuget
