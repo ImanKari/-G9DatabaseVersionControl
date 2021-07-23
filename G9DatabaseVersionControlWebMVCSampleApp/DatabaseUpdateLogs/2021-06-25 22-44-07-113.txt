@@ -1,4 +1,0 @@
-############################## Exception ##############################
-[2021-06-25 22:44:07]: Exception Message: The ConnectionString property has not been initialized.
-File Name: G:\Project\G9DatabaseVersionControl\G9DatabaseVersionControlCore.SqlServer\G9CDatabaseVersionControlCoreSQLServer.cs	Method Base: GetDatabaseVersion	Line Number: 313
-

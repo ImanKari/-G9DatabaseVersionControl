@@ -1,4 +1,0 @@
-############################## Exception ##############################
-[2021-07-09 12:28:17]: Exception Message: An object or column name is missing or empty. For SELECT INTO statements, verify each column has a name. For other statements, look for empty alias names. Aliases defined as "" or [] are not allowed. Change the alias to a valid name.
-File Name: G:\Project\G9DatabaseVersionControl\G9DatabaseVersionControlCore.SqlServer\G9CDatabaseVersionControlCoreSQLServer.cs	Method Base: StartInstall	Line Number: 504
-

@@ -1,4 +1,0 @@
-############################## Exception ##############################
-[2021-06-26 00:34:30]: Exception Message: Database 'Project1' already exists. Choose a different database name.
-File Name: G:\Project\G9DatabaseVersionControl\G9DatabaseVersionControlCore.SqlServer\G9CDatabaseVersionControlCoreSQLServer.cs	Method Base: StartInstall	Line Number: 510
-

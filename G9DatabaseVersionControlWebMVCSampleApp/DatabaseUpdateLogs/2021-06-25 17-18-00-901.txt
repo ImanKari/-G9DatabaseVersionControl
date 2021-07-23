@@ -1,4 +1,0 @@
-############################## Exception ##############################
-[2021-06-25 17:18:00]: Exception Message: Database 'G9DatabaseVersionControlWebMVCSampleApp' does not exist. Make sure that the name is entered correctly.
-File Name: G:\Project\G9DatabaseVersionControl\G9DatabaseVersionControlCore.SqlServer\G9CDatabaseVersionControlCoreSQLServer.cs	Method Base: GetDatabaseVersion	Line Number: 288
-
