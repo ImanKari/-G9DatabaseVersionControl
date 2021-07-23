@@ -1,6 +1,0 @@
-############################## ERROR ##############################
-[2021-07-23 23:34:31]: Error on execute update script.
-Script path: G:\Project\G9DatabaseVersionControl\G9DatabaseVersionControlWebMVCSampleApp\DatabaseUpdateFiles\Project1\1.0.0.1-20210720\001- Create Test Database.sql
-Exception Message: Database 'DynamicMeterReadingSystem' does not exist. Make sure that the name is entered correctly.
-File Name: G:\Project\G9DatabaseVersionControl\G9DatabaseVersionControlCore.SqlServer\G9CDatabaseVersionControlCoreSQLServer.cs	Method Base: ExecutesScriptsOnDatabase	Line Number: 666
-
