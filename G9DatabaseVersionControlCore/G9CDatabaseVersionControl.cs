@@ -211,14 +211,14 @@ namespace G9DatabaseVersionControlCore
                                             $"Requirement Error! The 'Description' is not set in the update script file! Script path: {projectUpdateFileName}");
 
                                     if (map.DatabaseScriptRequirements.IsRequiredToSetVersion &&
-                                        string.IsNullOrEmpty(version))
+                                        (string.IsNullOrEmpty(version) || !int.TryParse(version.Replace(".", string.Empty), out _)))
                                         throw new Exception(
-                                            $"Requirement Error! The 'Version' is not set in the update script file! Script path: {projectUpdateFileName}");
+                                            $"Requirement Error! The 'Version' is not set or incorrect in the update script file! Script path: {projectUpdateFileName}");
 
                                     if (map.DatabaseScriptRequirements.IsRequiredToSetUpdateDateTime &&
                                         updateDateTime == DateTime.MinValue)
                                         throw new Exception(
-                                            $"Requirement Error! The 'UpdateDateTime' is not set in the update script file! Script path: {projectUpdateFileName}");
+                                            $"Requirement Error! The 'UpdateDateTime' is not set or incorrect in the update script file! Script path: {projectUpdateFileName}");
                                 }
 
                                 updateFilesInfo.Add(new G9DtUpdateFilesInfo(GetFullPathFromPath(projectUpdateFileName),
@@ -486,7 +486,7 @@ namespace G9DatabaseVersionControlCore
         /// <returns>Get last name from path</returns>
         private string RemovePreFixPath(string path)
         {
-            return path.Remove(0, path.LastIndexOf(Path.DirectorySeparatorChar) + 1);
+            return path.Remove(0, path.LastIndexOf("\\", StringComparison.Ordinal) + 1).Remove(0, path.LastIndexOf("/", StringComparison.Ordinal) + 1);
         }
 
         /// <summary>

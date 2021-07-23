@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="CD &quot;$(ProjectDir)&quot;&#xD;&#xA;IF EXIST G9DBVCValidation.ps1 (&#xD;&#xA;@ECHO Post-build script exists at: $(ProjectDir)G9DBVCValidation.ps1- executing...&#xD;&#xA;CALL &quot;G9DBVCValidation.ps1&quot; &quot;$(ProjectDir)&quot;&#xD;&#xA;)" />
+  </Target>
+
+  <ItemGroup>
+    <PackageReference Include="G9DatabaseVersionControlCore" Version="2.0.0.13" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="&#xD;&#xA;New-Item &quot;G:\Project\G9DatabaseVersionControl\G9DatabaseVersionControlSampleUpdate\Abababa.sql&quot; -Force&#xD;&#xA;Set-Content -Path &quot;G:\Project\G9DatabaseVersionControl\G9DatabaseVersionControlSampleUpdate\Abababa.sql&quot; -Value &quot;-- Note: Do not use this file in any way, this file will be replaced with new content in updates.&quot;&#xD;&#xA;exit 0&#xD;&#xA;" />
+  </Target>
+
+  <ItemGroup>
+    <PackageReference Include="G9DatabaseVersionControlCore" Version="2.0.1.120" />
+  </ItemGroup>
+
+</Project>
