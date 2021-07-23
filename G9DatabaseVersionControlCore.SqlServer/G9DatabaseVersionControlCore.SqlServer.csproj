@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>net45;net451;net452;netstandard1.3;netstandard1.4;netstandard1.5;netstandard1.6;netstandard2.0;netstandard2.1</TargetFrameworks>
-    <Version>2.0.0.3</Version>
+    <Version>2.0.2.1</Version>
     <Authors>Iman Kari</Authors>
     <Company>G9Studio</Company>
     <Product>G9 Database Version Control</Product>
@@ -14,16 +14,12 @@
     <RepositoryUrl>https://github.com/ImanKari/G9DatabaseVersionControl</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>Database DB Version Control DatabaseVersion DatabaseVersionControl</PackageTags>
-    <PackageReleaseNotes>-- Fixed default logger
--- Separate web content from the core
--- Add Web output ready project to manage database version
--- Fixed connection string drop down in web output
--- Support multi custom task
--- Add choose multi task in UI</PackageReleaseNotes>
+    <PackageReleaseNotes>-- Add pre-build custom validation check
+-- Add custom targets generator for (Windows and linux)</PackageReleaseNotes>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <AssemblyVersion>2.0.0.3</AssemblyVersion>
-    <FileVersion>2.0.0.3</FileVersion>
+    <AssemblyVersion>2.0.2.1</AssemblyVersion>
+    <FileVersion>2.0.2.1</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>

@@ -6,6 +6,7 @@ namespace G9DatabaseVersionControlSampleUpdate
     {
         private static void Main(string[] args)
         {
+            
             Console.WriteLine("Hello World!");
         }
     }
