@@ -83,7 +83,7 @@ namespace G9DatabaseVersionControlWebMVCSampleApp.Controllers
 ( NAME = N'Test_log', FILENAME = N'{customDbPath}\{customDbName}.ldf' , SIZE = 8192KB , MAXSIZE = 2048GB , FILEGROWTH = 65536KB )
  WITH CATALOG_COLLATION = DATABASE_DEFAULT";
                     },
-                    new G9DtMapDatabaseScriptRequirements(true, true),
+                    new G9DtMapDatabaseScriptRequirements(true, true, needToSaveUpdatedScriptData: true, isRequiredToRemoveGoPhrase: true),
 
                     // Custom params:
                     @"DatabaseUpdateFiles\",
