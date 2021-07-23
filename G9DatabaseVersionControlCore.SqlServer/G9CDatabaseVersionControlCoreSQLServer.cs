@@ -345,11 +345,11 @@ IF (NOT EXISTS
     SELECT *
     FROM INFORMATION_SCHEMA.TABLES
     WHERE TABLE_SCHEMA = '{ProjectMapData.DefaultSchemaForTables}'
-          AND TABLE_NAME = 'G9DatabaseUpdateHistory'
+          AND TABLE_NAME = 'G9DatabaseVersionUpdateHistory'
 )
    )
 BEGIN
-    CREATE TABLE [{ProjectMapData.DefaultSchemaForTables}].[G9DatabaseUpdateHistory]
+    CREATE TABLE [{ProjectMapData.DefaultSchemaForTables}].[G9DatabaseVersionUpdateHistory]
     (
         [UpdateFileFullPath] [NVARCHAR](300) NOT NULL,
         [ExecuteDateTime] [DATETIME2](7) NOT NULL,
@@ -372,7 +372,20 @@ BEGIN
     )
     VALUES
     (N'0.0.0.0', N'{ProjectMapData.DefaultSchemaForTables}', '1990-09-01 00:00:00', '1990-09-01 00:00:00');
-END;");
+END;
+IF 1 = {(ProjectMapData.DatabaseScriptRequirements.NeedToSaveUpdatedScriptData ? "1" : "0")}
+   AND NOT EXISTS
+(
+    SELECT 1
+    FROM sys.columns
+    WHERE name = N'UpdateScriptFileData'
+          AND object_id = OBJECT_ID(N'{ProjectMapData.DefaultSchemaForTables}.G9DatabaseVersionUpdateHistory')
+)
+BEGIN
+    ALTER TABLE [{ProjectMapData.DefaultSchemaForTables}].[G9DatabaseVersionUpdateHistory]
+    ADD UpdateScriptFileData NVARCHAR(MAX) NULL;
+END;
+");
         }
 
         /// <inheritdoc />
@@ -393,9 +406,10 @@ IF EXISTS
     SELECT 1
     FROM INFORMATION_SCHEMA.TABLES
     WHERE TABLE_SCHEMA = '{ProjectMapData.DefaultSchemaForTables}'
-          AND TABLE_NAME = 'G9DatabaseUpdateHistory'
+          AND TABLE_NAME = 'G9DatabaseVersionUpdateHistory'
 )
-    DROP TABLE [{ProjectMapData.DefaultSchemaForTables}].[G9DatabaseUpdateHistory];");
+    DROP TABLE [{ProjectMapData.DefaultSchemaForTables}].[G9DatabaseVersionUpdateHistory];
+");
                 return true;
             }
             catch (Exception ex)
@@ -626,12 +640,12 @@ IF EXISTS
                             ExecuteQueryWithoutResult(file.UpdateFileData);
 
                             var queryUpdateHistory =
-                                $@"INSERT INTO [{ProjectMapData.DefaultSchemaForTables}].[G9DatabaseUpdateHistory]
-([UpdateFileFullPath], [ExecuteDateTime], [Author], [Description], [UpdateDateTime], [Version], [IsSuccess])
+                                $@"INSERT INTO [{ProjectMapData.DefaultSchemaForTables}].[G9DatabaseVersionUpdateHistory]
+([UpdateFileFullPath], [ExecuteDateTime], [Author], [Description], [UpdateDateTime], [Version], [IsSuccess], [UpdateScriptFileData])
 VALUES
 ('{FixedLengthFromEndOfString(file.UpdateFileFullPath, 300)}', GETDATE(), '{FixedLengthFromEndOfString(file.Author, 30)}',
 '{FixedLengthFromEndOfString(file.Description, 300)}',  '{file.UpdateDateTime.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture)}',
-'{FixedLengthFromEndOfString(file.Version, 30)}', 1);";
+'{FixedLengthFromEndOfString(file.Version, 30)}', 1, '{(ProjectMapData.DatabaseScriptRequirements.NeedToSaveUpdatedScriptData ? file.UpdateFileData.Replace("'", "''") : "NULL")}');";
                             try
                             {
                                 ExecuteQueryWithoutResult(queryUpdateHistory);
@@ -652,12 +666,12 @@ VALUES
                             // Ignore
 
                             var queryUpdateHistory =
-                                $@"INSERT INTO [{ProjectMapData.DefaultSchemaForTables}].[G9DatabaseUpdateHistory]
-([UpdateFileFullPath], [ExecuteDateTime], [Author], [Description], [UpdateDateTime], [Version], [IsSuccess])
+                                $@"INSERT INTO [{ProjectMapData.DefaultSchemaForTables}].[G9DatabaseVersionUpdateHistory]
+([UpdateFileFullPath], [ExecuteDateTime], [Author], [Description], [UpdateDateTime], [Version], [IsSuccess], [UpdateScriptFileData])
 VALUES
 ('{FixedLengthFromEndOfString(file.UpdateFileFullPath, 300)}', GETDATE(), '{FixedLengthFromEndOfString(file.Author, 30)}',
 '{FixedLengthFromEndOfString(file.Description, 30)}',  '{file.UpdateDateTime.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture)}',
-'{FixedLengthFromEndOfString(file.Version, 30)}', 0);";
+'{FixedLengthFromEndOfString(file.Version, 30)}', 0, '{(ProjectMapData.DatabaseScriptRequirements.NeedToSaveUpdatedScriptData ? file.UpdateFileData.Replace("'", "''") : "NULL")}');";
                             try
                             {
                                 ExecuteQueryWithoutResult(queryUpdateHistory);
@@ -919,7 +933,8 @@ VALUES
                             GetAssignedMaps()
                                 .First(s => s.ProjectName == startCustomTask.ProjectName));
                         Task.Run(async () =>
-                            await _installOrUpdateObject.StartCustomTask(startCustomTask.CustomTaskNickname, startCustomTask.DatabaseName));
+                            await _installOrUpdateObject.StartCustomTask(startCustomTask.CustomTaskNickname,
+                                startCustomTask.DatabaseName));
                         return JsonConvert.SerializeObject(new G9DtTaskAnswer
                         {
                             Success = true
