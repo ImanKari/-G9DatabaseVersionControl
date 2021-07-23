@@ -34,7 +34,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="DatabaseUpdateFiles\Project1\1.0.0.1-20210720\" />
     <Folder Include="DatabaseUpdateLogs\" />
   </ItemGroup>
 
