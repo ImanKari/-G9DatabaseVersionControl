@@ -637,7 +637,10 @@ IF EXISTS
                     foreach (var file in folder.UpdateFilesInfos)
                         try
                         {
-                            ExecuteQueryWithoutResult(file.UpdateFileData);
+                            ExecuteQueryWithoutResult(
+                                ProjectMapData.DatabaseScriptRequirements.IsRequiredToRemoveGoPhrase
+                                    ? RemoveGoPhraseFromQuery(file.UpdateFileData)
+                                    : file.UpdateFileData);
 
                             var queryUpdateHistory =
                                 $@"INSERT INTO [{ProjectMapData.DefaultSchemaForTables}].[G9DatabaseVersionUpdateHistory]
@@ -671,7 +674,7 @@ VALUES
 VALUES
 ('{FixedLengthFromEndOfString(file.UpdateFileFullPath, 300)}', GETDATE(), '{FixedLengthFromEndOfString(file.Author, 30)}',
 '{FixedLengthFromEndOfString(file.Description, 30)}',  '{file.UpdateDateTime.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture)}',
-'{FixedLengthFromEndOfString(file.Version, 30)}', 0, '{(ProjectMapData.DatabaseScriptRequirements.NeedToSaveUpdatedScriptData ? file.UpdateFileData.Replace("'", "''") : "NULL")}');";
+'{FixedLengthFromEndOfString(file.Version, 30)}', 0, '{(ProjectMapData.DatabaseScriptRequirements.IsRequiredToRemoveGoPhrase ? file.UpdateFileData.Replace("'", "''") : "NULL")}');";
                             try
                             {
                                 ExecuteQueryWithoutResult(queryUpdateHistory);
@@ -696,6 +699,24 @@ VALUES
                 Logger.G9SmallLogException(ex);
                 throw;
             }
+        }
+
+        /// <summary>
+        ///     Method to remove "GO" phrase from query
+        ///     <para />
+        ///     Notice: This setting is for SQL Server only!
+        ///     <para />
+        ///     <see href="https://stackoverflow.com/questions/25680812/incorrect-syntax-near-go">Incorrect syntax near 'GO'</see>
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns>Specifies query</returns>
+        private string RemoveGoPhraseFromQuery(string query)
+        {
+            return query.IndexOf("\r\n", StringComparison.Ordinal) != -1
+                ? string.Join("\r\n",
+                    query.Split(new[] {"\r\n"}, StringSplitOptions.None)
+                        .Where(s => s.ToUpper() != "GO" && s.ToUpper() != "GO;"))
+                : query;
         }
 
         /// <inheritdoc />
