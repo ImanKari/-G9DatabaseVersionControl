@@ -1,10 +1,10 @@
-# ASP.NET 
-# Build and test ASP.NET projects.
-# Add steps that publish symbols, save build artifacts, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/apps/aspnet/build-aspnet-4
+# ASP.NET Core (.NET Framework)
+# Build and test ASP.NET Core projects targeting the full .NET Framework.
+# Add steps that publish symbols, save build artifacts, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
 
 trigger:
-- master
+- main
 
 pool:
   vmImage: 'windows-latest'
@@ -15,58 +15,6 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
-- task: NuGetToolInstaller@1
-
-- task: NuGetCommand@2
-  inputs:
-    restoreSolution: '$(solution)'
-
-- task: VSBuild@1
-  inputs:
-    solution: 'G9DatabaseVersionControlCore/G9DatabaseVersionControlCore.sln'
-    msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="$(build.artifactStagingDirectory)"'
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
-    
-
-- task: VSTest@2
-  inputs:
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
-
-- task: DotNetCoreCLI@2
-  displayName: "Publish G9DatabaseVersionControlCore Library nuget packages to nuget.org"
-  inputs:
-    command: custom
-    custom: nuget
-    arguments: >
-      push $(Pipeline.Workspace)/**/G9DatabaseVersionControlCore/bin/Release/*.nupkg
-      -s https://api.nuget.org/v3/index.json
-      -k $(NuGetApiKey) 
-      --skip-duplicate
-
-- task: DotNetCoreCLI@2
-  displayName: "Publish G9DatabaseVersionControlCore.WebOutput Library nuget packages to nuget.org"
-  inputs:
-    command: custom
-    custom: nuget
-    arguments: >
-      push $(Pipeline.Workspace)/**/G9DatabaseVersionControlCore.WebOutput/bin/Release/*.nupkg
-      -s https://api.nuget.org/v3/index.json
-      -k $(NuGetApiKey) 
-      --skip-duplicate
-
-- task: DotNetCoreCLI@2
-  displayName: "Publish G9DatabaseVersionControlCore.SqlServer nuget packages to nuget.org"
-  inputs:
-    command: custom
-    custom: nuget
-    arguments: >
-      push $(Pipeline.Workspace)/**/G9DatabaseVersionControlCore.SqlServer/bin/Release/*.nupkg
-      -s https://api.nuget.org/v3/index.json
-      -k $(NuGetApiKey) 
-      --skip-duplicate
-
 - task: PowerShell@2
   displayName: "Sync Azure Devops repo with GitHub repo"
   inputs:

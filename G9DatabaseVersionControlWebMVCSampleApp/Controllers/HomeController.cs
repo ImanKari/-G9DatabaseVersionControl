@@ -1,9 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using G9DatabaseVersionControlCore;
+﻿using G9DatabaseVersionControlCore;
 using G9DatabaseVersionControlCore.DataType;
 using G9DatabaseVersionControlCore.DataType.AjaxDataType;
 using G9DatabaseVersionControlCore.SqlServer;
@@ -13,6 +8,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using System;
+using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
+using System.Text;
 
 namespace G9DatabaseVersionControlWebMVCSampleApp.Controllers
 {
@@ -168,7 +168,7 @@ namespace G9DatabaseVersionControlWebMVCSampleApp.Controllers
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
-            return View(new ErrorViewModel {RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier});
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }
