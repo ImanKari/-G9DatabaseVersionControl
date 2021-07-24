@@ -12,12 +12,17 @@ $SyncHash = [hashtable]::Synchronized(@{Test='Test'})
 
 # Get assembly version
 $xml = [Xml] (Get-Content $projectCprojPath)
-$version = [Version] $xml.Project.PropertyGroup.Version
+[String] $version = [String]::Empty
+if ($xml.Project.PropertyGroup.Version -is [Array]){
+    $version = $xml.Project.PropertyGroup.Version[0].ToString()
+}else{
+    $version = $xml.Project.PropertyGroup.Version.ToString()
+}
 $targetFileName = "$($projectDir)build\G9DatabaseVersionControlCore.targets"
 
 # Check validation
 if ([String]::IsNullOrEmpty($version)){
-    Write-Host 'InitializeTargets.ps1' : error -9: 'Version not found!'
+    Write-Host $projectDir'build\InitializeTargets.ps1(20)' : error -9: 'Version not found!'
     exit 1
 }
 
@@ -27,9 +32,7 @@ if (-not(Test-Path $targetFileName)){
 }
 
 # Set content for file
-$targetsFileData = (Get-Content $targetFileName);
-if ($targetsFileData -eq $null -or $targetsFileData.IndexOf($version) -eq -1){
-    Set-Content $targetFileName "<?xml version=""1.0"" encoding=""utf-8""?>
+Set-Content $targetFileName "<?xml version=""1.0"" encoding=""utf-8""?>
 <!-- NOTICE: This file is created automatically by Script 'InitializeTargets.ps1'. -->
 <Project ToolsVersion=""4.0"" xmlns=""http://schemas.microsoft.com/developer/msbuild/2003"">
   <Target Name=""BeforeBeforeBuild"" BeforeTargets=""BeforeBuild"">
@@ -41,7 +44,6 @@ if ($targetsFileData -eq $null -or $targetsFileData.IndexOf($version) -eq -1){
       Condition="" '`$(NuGetPackageRoot)' != '' AND '`$(OS)' != 'Windows_NT' "" />
   </Target>
 </Project>" -force
-}
 
 # Unlock
 if ($LockTaken)

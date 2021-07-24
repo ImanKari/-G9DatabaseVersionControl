@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>net45;net451;net452;netstandard1.3;netstandard1.4;netstandard1.5;netstandard1.6;netstandard2.0;netstandard2.1</TargetFrameworks>
-    <Version>2.0.2.2</Version>
+    <Version>2.0.2.3</Version>
     <Authors>Iman Kari</Authors>
     <Company>G9Studio</Company>
     <Product>G9 Database Version Control</Product>
@@ -14,15 +14,18 @@
     <RepositoryUrl>https://github.com/ImanKari/G9DatabaseVersionControl</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>Database DB Version Control DatabaseVersion DatabaseVersionControl</PackageTags>
-    <PackageReleaseNotes>-- Add pre-build custom validation check
+    <PackageReleaseNotes>-- Add GenerateDocumentationFile
+-- Add pre-build custom validation check
 -- Add custom targets generator for (Windows and linux)
 -- Add UpdateScriptFileData to table G9DatabaseVersionUpdateHistory
 -- Add new option for logging update script data in table
 -- Add new option for auto remove "GO" phrase (Solve problem: Incorrect syntax near 'GO' in old database)</PackageReleaseNotes>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <AssemblyVersion>2.0.2.2</AssemblyVersion>
-    <FileVersion>2.0.2.2</FileVersion>
+    <AssemblyVersion>2.0.2.3</AssemblyVersion>
+    <FileVersion>2.0.2.3</FileVersion>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
   </PropertyGroup>
 
   <ItemGroup>
