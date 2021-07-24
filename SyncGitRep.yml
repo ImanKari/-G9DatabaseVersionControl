@@ -15,7 +15,7 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
-task: PowerShell@2
+- task: PowerShell@2
   displayName: "Sync Azure Devops repo with GitHub repo"
   inputs:
     targetType: 'inline'
