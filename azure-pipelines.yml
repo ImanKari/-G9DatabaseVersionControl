@@ -101,6 +101,9 @@ steps:
         Write-Host "The given folder path $githubDir already exists";
       }
       Set-Location $destination
+      Write-Output '*****Ignore gient file****'
+      git rm --cached giant_file
+      git commit --amend -CHEAD
       Write-Output '*****Git removing remote secondary****'
       git remote rm secondary
       Write-Output '*****Git remote add****'
