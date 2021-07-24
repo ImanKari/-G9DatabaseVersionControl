@@ -39,9 +39,9 @@ Set-Content $targetFileName "<?xml version=""1.0"" encoding=""utf-8""?>
     <Exec
       Command=""powershell `$(NuGetPackageRoot)/g9databaseversioncontrolcore/$version/tools/G9DBVCValidation.ps1 `$(ProjectDir)""
       Condition="" '`$(NuGetPackageRoot)' != '' AND '`$(OS)' == 'Windows_NT' "" />
-    <Exec
+    <!--<Exec
       Command=""command -v pwsh >/dev/null 2>&amp;1 &amp;&amp; pwsh `$(NuGetPackageRoot)/g9databaseversioncontrolcore/$version/tools/G9DBVCValidation.ps1 `$(ProjectDir) || echo 'PowerShell' : warning -9: '[Warning]: PowerShell software must be installed for verification and validation of the Database version control file (Only required for development environment on Linux and Mac to access &quot;pwsh&quot; command). https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell-core-on-linux?view=powershell-7.1'""
-      Condition="" '`$(NuGetPackageRoot)' != '' AND '`$(OS)' != 'Windows_NT' "" />
+      Condition="" '`$(NuGetPackageRoot)' != '' AND '`$(OS)' != 'Windows_NT' "" />-->
   </Target>
 </Project>" -force
 
