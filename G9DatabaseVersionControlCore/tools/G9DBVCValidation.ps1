@@ -86,7 +86,7 @@ function CheckValidation
     [int] $lastPosVersion = -1
 
     # --- Read file data ---
-    [string] $fileData = Get-Content $filePath -Encoding UTF8 -Raw
+    [string] $fileData = Get-Content -LiteralPath $filePath -Encoding UTF8 -Raw
 
     # --- Temp variables for save final result ---
     [bool] $finalResult = $true 
