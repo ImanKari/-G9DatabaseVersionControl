@@ -551,6 +551,34 @@ namespace G9DatabaseVersionControlCore
         }
 
         /// <summary>
+        ///     Method to set last task error
+        /// </summary>
+        /// <param name="message">Specifies message for return</param>
+        /// <param name="fatalError">Specifies error is a fatal error - if set true, stop install in view</param>
+        protected void SetLastTaskError(string message, bool fatalError = true)
+        {
+            try
+            {
+                _lastTaskStatus = new G9DtTaskAnswer
+                {
+                    Success = false,
+                    NeedShowMessage = true,
+                    Message = message,
+                    FatalErrorStopInstall = fatalError,
+                    StepOfInstall = !Equals(_lastTaskStatus, default(G9DtTaskAnswer)) ? _lastTaskStatus.StepOfInstall : G9ETaskStatus.SetConnectionString,
+                    PercentCurrectStep = !Equals(_lastTaskStatus, default(G9DtTaskAnswer)) ? _lastTaskStatus.PercentCurrectStep : 0,
+                    RowReceiveNumberCount = !Equals(_lastTaskStatus, default(G9DtTaskAnswer)) ? _lastTaskStatus.RowReceiveNumberCount : 0,
+                    NumberOfErrorScript = !Equals(_lastTaskStatus, default(G9DtTaskAnswer)) ? _lastTaskStatus.NumberOfErrorScript : 0
+                };
+            }
+            catch (Exception e)
+            {
+                Logger.G9SmallLogException(e);
+                throw;
+            }
+        }
+
+        /// <summary>
         ///     Method for add to count of error script
         /// </summary>
         protected void PlusCountOfTaskError()

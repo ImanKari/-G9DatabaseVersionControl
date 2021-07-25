@@ -693,7 +693,7 @@ $(document).ready(function() {
                     : G9ETaskRequest.CustomTask,
                     `{DataSource: '${DataSourceTXTB}',  UserId: '${$("#DB_UserId").val()}', Password: '${
                     $("#DB_Password").val()}',  DatabaseName: '${databaseName}',  ProjectName: '${
-                    ProjectsMapData[ChooseProjectIndex].ProjectName}', CustomDatabaseRestorePath: ${DBURL}, CustomTaskNickname: '${CustomTaskNickName}'}`),
+                    ProjectsMapData[ChooseProjectIndex].ProjectName}', CustomDatabaseRestorePath: ${DBURL == null ? "null" : `'${DBURL}'`}, CustomTaskNickname: '${CustomTaskNickName}'}`),
                 function(resualt) {
                     if (resualt.Success) {
                         setTimeout(function() {
@@ -707,7 +707,7 @@ $(document).ready(function() {
                             3969);
                     } else {
                         $(".MainDiv_CenterDiv_SetDataForInstall").fadeIn(369);
-                        ShowMessage("نصب با مشکل مواجه شده است لطفا لاگ را چک کنید", false, true);
+                        ShowMessage((resualt.Message == null || resualt.Message == "" ? "نصب با مشکل مواجه شده است لطفا لاگ را چک کنید" : resualt.Message), false, true);
                         StopLoading();
                     }
                 },

@@ -424,26 +424,35 @@ IF EXISTS
         {
             return await Task.Run(() =>
             {
-                SetLastTaskStatus(G9ETaskStatus.UpdateDataBase, 0);
+                try
+                {
+                    SetLastTaskStatus(G9ETaskStatus.UpdateDataBase, 0);
 
-                // Step 1: Rename the database as needed
-                if (ProjectMapData.EnableSetCustomDatabaseName && !string.IsNullOrEmpty(customDatabaseName) &&
-                    customDatabaseName != ProjectMapData.DatabaseName)
-                    ProjectMapData.ChangeDatabaseName(customDatabaseName);
+                    // Step 1: Rename the database as needed
+                    if (ProjectMapData.EnableSetCustomDatabaseName && !string.IsNullOrEmpty(customDatabaseName) &&
+                        customDatabaseName != ProjectMapData.DatabaseName)
+                        ProjectMapData.ChangeDatabaseName(customDatabaseName);
 
-                // Step 2: Create Requirements tables if not exists
-                CreateRequirementTables();
+                    // Step 2: Create Requirements tables if not exists
+                    CreateRequirementTables();
 
-                // Step 3: If there was an update for the current version  => Execute update scripts on the database
-                if (CheckUpdateExist())
-                    ExecutesScriptsOnDatabase(GetUpdateFolders(), GetCountOfUpdateFiles());
+                    // Step 3: If there was an update for the current version  => Execute update scripts on the database
+                    if (CheckUpdateExist())
+                        ExecutesScriptsOnDatabase(GetUpdateFolders(), GetCountOfUpdateFiles());
 
-                SetLastTaskStatus(G9ETaskStatus.UpdateDataBase, 100);
+                    SetLastTaskStatus(G9ETaskStatus.UpdateDataBase, 100);
 
-                SetLastTaskStatus(G9ETaskStatus.InstallFinished, 100);
+                    SetLastTaskStatus(G9ETaskStatus.InstallFinished, 100);
 
-                // Last step: return true
-                return true;
+                    // Last step: return true
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    SetLastTaskError($"Update Error\n{ex.Message}");
+                    Logger.G9SmallLogException(ex);
+                    throw;
+                }
             });
         }
 
@@ -521,6 +530,7 @@ IF EXISTS
                 }
                 catch (Exception ex)
                 {
+                    SetLastTaskError($"Install Error\n{ex.Message}");
                     Logger.G9SmallLogException(ex);
                     throw;
                 }
@@ -818,7 +828,7 @@ VALUES
             using (var connection = new SqlConnection(ConnectionString))
             {
                 const string script =
-                    "SELECT LEFT(physical_name,LEN(physical_name) - charindex('\\',reverse(physical_name),1) + 1) [path] FROM SYS.database_files WHERE type=0";
+                    "SELECT SERVERPROPERTY('instancedefaultdatapath') AS [DefaultFile]";
 
                 connection.Open();
 
@@ -829,7 +839,7 @@ VALUES
                     {
                         if (reader.Read())
                         {
-                            var pathForDatabase = reader["path"].ToString();
+                            var pathForDatabase = reader["DefaultFile"].ToString();
                             if (string.IsNullOrEmpty(pathForDatabase))
                                 throw new Exception(
                                     $"The specified path is not available for storing database files. Path: '{pathForDatabase}'");
@@ -893,7 +903,7 @@ VALUES
                                                 .GetDatabaseVersion()
                                             : "0.0.0.0",
                                     ExistBaseDatabase = s.BaseDatabaseType != G9EBaseDatabaseType.NotSet,
-                                    CustomTasksItems = s.CustomTasks.Any()
+                                    CustomTasksItems = s.CustomTasks != null && s.CustomTasks.Any()
                                         ? s.CustomTasks.Select(x => new {x.Nickname, x.Description}).ToArray()
                                         : null,
                                     s.EnableSetCustomDatabaseName,
@@ -940,6 +950,15 @@ VALUES
                             startUpdate.UserId, startUpdate.Password,
                             GetAssignedMaps()
                                 .First(s => s.ProjectName == startUpdate.ProjectName));
+
+                        if (!_installOrUpdateObject.CheckUpdateExist())
+                            return JsonConvert.SerializeObject(new G9DtTaskAnswer
+                            {
+                                Success = false,
+                                Message = "The database has received the latest updates.",
+                                FatalErrorStopInstall = true
+                            });
+
                         Task.Run(async () =>
                             await _installOrUpdateObject.StartUpdate(startUpdate.DatabaseName));
                         return JsonConvert.SerializeObject(new G9DtTaskAnswer
@@ -968,6 +987,7 @@ VALUES
             }
             catch (Exception ex)
             {
+                Logger.G9SmallLogException(ex);
                 return JsonConvert.SerializeObject(new G9DtTaskAnswer
                 {
                     Success = false,
