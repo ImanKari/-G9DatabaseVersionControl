@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>net45;net451;net452;netstandard1.3;netstandard1.4;netstandard1.5;netstandard1.6;netstandard2.0;netstandard2.1</TargetFrameworks>
-    <Version>2.0.2.40</Version>
+    <Version>2.0.2.41</Version>
     <Authors>G9Studio</Authors>
     <Product>G9 Database Version Control Web Output</Product>
     <Description>G9 Database Version Control Web Output | Web output ready to manage database version</Description>
@@ -14,15 +14,16 @@
     <PackageIconUrl />
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>Database DB Version Control DatabaseVersion DatabaseVersionControl DatabaseVersionControlWebOutput WebOutput Web Output</PackageTags>
-    <PackageReleaseNotes>-- Fixed: Add check update exist before start update
+    <PackageReleaseNotes>-- Added: Check condition for exists (DatabaseVersionControlValidation.ps1) then test validation
+-- Fixed: Add check update exist before start update
 -- Fixed: Get default data path for restore database
 -- Fixed: Set last task error
 -- Fixed: Return error in 'HandleTaskRequest'
 -- Fixed: Set path in web output</PackageReleaseNotes>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <AssemblyVersion>2.0.2.40</AssemblyVersion>
-    <FileVersion>2.0.2.40</FileVersion>
+    <AssemblyVersion>2.0.2.41</AssemblyVersion>
+    <FileVersion>2.0.2.41</FileVersion>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
   </PropertyGroup>
