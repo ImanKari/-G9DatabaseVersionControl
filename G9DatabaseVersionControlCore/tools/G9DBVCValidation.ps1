@@ -15,7 +15,7 @@ if ([String]::IsNullOrEmpty($ValidationConfigFullPath) -or -not[System.IO.File]:
 }
 
 # --- Get validations settings ---
-$result = Invoke-Expression $ValidationConfigFullPath
+$result = Invoke-Expression ($ValidationConfigFullPath -replace ' ','` ')
 if (-not ($result -is [array])){
     Write-Host $ValidationConfigFullPath : error -9: 'Return ERROR. The database validation settings file must be returned an array. Sample: "return @(($true, $false, $false, $false, $false, $null), etc...)". Path: ' + $ValidationConfigFullPath
     exit 1

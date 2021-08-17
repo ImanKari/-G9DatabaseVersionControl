@@ -17,4 +17,4 @@ Important Note: The database validation settings in multi-project (Bidimensional
 Linux Install: https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell-core-on-linux?view=powershell-7.1
 Mac Install: https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell-core-on-macos?view=powershell-7.1
 #>
-return @(($true, $false, $false, $false, $null))
+return @(($true, $true, $true, $true, $null))
